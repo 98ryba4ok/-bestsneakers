@@ -1,0 +1,58 @@
+header{
+    height: 100px;
+    background-color: #fff;
+  box-shadow: 0 3px 30px rgba(0, 0, 0, 0.2);
+
+    
+}
+.headerCenter {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 100px 0 20px;
+  gap: 40px;
+}
+.navWrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.logo{
+    width: 275px;
+    height: 100px;
+}
+nav{
+    display: flex;
+    gap: 140px;
+    align-items: center;
+    padding: 0 20px;
+    font-weight: 300;
+    
+}
+.navLink{
+    text-decoration: none;
+    color: #000;
+    font-size: 20px;
+}
+.navButtons button {
+  background-color: transparent; /* вместо none */
+  border: none;
+  padding: 0; /* убираем лишние отступы */
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navButtons button img {
+  width: 35px; /* можно подогнать под нужный размер */
+  height: 35px;
+  object-fit: contain;
+}
+.navButtons{
+    display: flex;
+    margin-left: auto;
+    gap: 20px;
+}

@@ -1,0 +1,218 @@
+.footer,
+.footer * {
+  box-sizing: border-box;
+}
+.footer {
+  background: rgba(224, 224, 224, 0.3);
+  padding: 25px 40px 25px 40px;
+  height: 250px;
+  position: relative;
+  box-shadow: 0px 4px 25px 0px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+.footer .logofixed-1 {
+  width: 275px;
+  height: 125px;
+  position: absolute;
+  left: 1073px;
+  top: 20px;
+  object-fit: cover;
+}
+.footer ._2018-2024-bestsnickers {
+  color: #000000;
+  text-align: left;
+  font-family: "OpenSans-Regular", sans-serif;
+  font-size: 16px;
+  line-height: 34px;
+  letter-spacing: 0.07em;
+  font-weight: 400;
+  position: absolute;
+  left: 50%;
+  translate: -50%;
+  bottom: 0px;
+  width: 239px;
+  height: 38px;
+}
+.footer .div {
+  display: flex;
+  flex-direction: row;
+  gap: 31px;
+  align-items: center;
+  justify-content: flex-start;
+  width: 192px;
+  height: 41px;
+  position: absolute;
+  left: 1120px;
+  top: 126px;
+}
+.footer .mingcute-telegram-fill {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  position: relative;
+  overflow: hidden;
+}
+.footer .group {
+  width: 83.74%;
+  height: 81.26%;
+  position: absolute;
+  right: 8.92%;
+  left: 7.33%;
+  bottom: 0.78%;
+  top: 17.97%;
+  overflow: visible;
+}
+.footer .akar-icons-vk-fill {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  position: relative;
+  overflow: visible;
+}
+.footer .mdi-pinterest {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  position: relative;
+  overflow: visible;
+}
+.footer .div2 {
+  display: flex;
+  flex-direction: row;
+  gap: 57px;
+  align-items: center;
+  justify-content: flex-start;
+  width: 548px;
+  position: absolute;
+  left: 102px;
+  top: calc(50% - 64px);
+}
+.footer .div3 {
+  display: flex;
+  flex-direction: row;
+  gap: 0px;
+  row-gap: 12px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  flex-shrink: 0;
+  width: 168px;
+  height: 99px;
+  position: relative;
+}
+.footer .div4 {
+  color: #000000;
+  text-align: left;
+  font-family: "Montserrat-SemiBold", sans-serif;
+  font-size: 22px;
+  line-height: 34px;
+  letter-spacing: 0.07em;
+  font-weight: 600;
+  position: relative;
+  width: 164px;
+  height: 25px;
+}
+.footer ._79999999999 {
+  color: #000000;
+  text-align: left;
+  font-family: "OpenSans-Regular", sans-serif;
+  font-size: 18px;
+  line-height: 34px;
+  letter-spacing: 0.07em;
+  font-weight: 400;
+  position: relative;
+  width: 155px;
+  height: 28px;
+}
+.footer .snickers-mail-com {
+  color: #000000;
+  text-align: left;
+  font-family: "OpenSans-Regular", sans-serif;
+  font-size: 18px;
+  line-height: 34px;
+  letter-spacing: 0.07em;
+  font-weight: 400;
+  position: relative;
+  width: 232px;
+  height: 28px;
+}
+.footer .div5 {
+  display: flex;
+  flex-direction: row;
+  gap: 0px;
+  row-gap: 12px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  flex-shrink: 0;
+  width: 170px;
+  height: 99px;
+  position: relative;
+}
+.footer .div6 {
+  color: #000000;
+  text-align: left;
+  font-family: "Montserrat-SemiBold", sans-serif;
+  font-size: 22px;
+  line-height: 34px;
+  letter-spacing: 0.07em;
+  font-weight: 600;
+  position: relative;
+  width: 178px;
+  height: 25px;
+}
+.footer .div7 {
+  color: #000000;
+  text-align: left;
+  font-family: "OpenSans-Regular", sans-serif;
+  font-size: 18px;
+  line-height: 34px;
+  letter-spacing: 0.07em;
+  font-weight: 400;
+  position: relative;
+  width: 178px;
+  height: 28px;
+}
+.footer .div8 {
+  display: flex;
+  flex-direction: row;
+  gap: 0px;
+  row-gap: 12px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  flex-shrink: 0;
+  width: 96px;
+  height: 99px;
+  position: relative;
+}
+.footer .div9 {
+  display: flex;
+  flex-direction: row;
+  gap: 0px;
+  row-gap: 12px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  width: 146px;
+  height: 99px;
+  position: absolute;
+  left: 668px;
+  top: 61px;
+}
+.footer .faq {
+  color: #000000;
+  text-align: left;
+  font-family: "Montserrat-SemiBold", sans-serif;
+  font-size: 22px;
+  line-height: 34px;
+  letter-spacing: 0.07em;
+  font-weight: 600;
+  position: relative;
+  width: 216px;
+  height: 25px;
+}
