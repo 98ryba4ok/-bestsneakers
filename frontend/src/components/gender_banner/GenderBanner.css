@@ -1,0 +1,35 @@
+.gender-banner {
+  display: flex;
+  justify-content: center; /* горизонтальное центрирование */
+  align-items: flex-end;   /* кнопка у нижнего края */
+  position: relative;
+  overflow: hidden;
+  width: 547px;
+  height: 588px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  padding-bottom: 33px;
+}
+
+.gender-banner__button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 320px;
+  padding: 10px 20px;
+  background-color: #E0E0E0;
+  opacity: 0.7;
+  color: #000;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 300;
+  font-size: 20px;
+  transition: background-color 0.3s ease;
+}
+
+
+.gender-banner__button:hover {
+  background-color: rgba(255, 255, 255, 1);
+}
+

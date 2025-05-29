@@ -1,39 +1,49 @@
 import "./Footer.css";
+import logo from "../../assets/logo.svg";
+import vkLogo from "../../assets/vk_logo.svg";
+import tgLogo from "../../assets/tg_logo.svg";
+import pinterestLogo from "../../assets/pinterest_logo.svg";
 
-export default function Footer  ({  ...props })  {
+export default function Footer() {
   return (
-    <div className={"footer " }>
-      <img className="logofixed-1" src="logofixed-10.png" />
-      <div className="_2018-2024-bestsnickers">2018-2024 Ⓒ BESTSNICKERS </div>
-      <div className="div">
-        <div className="mingcute-telegram-fill">
-          <img className="group" src="group0.svg" />
+    <footer className="footer">
+    
+<div className="flex_photo">
+    <div className="footer__sections">
+  <div className="footer__column">
+    <h4 className="footer__title">Поддержка</h4>
+    <a href="tel:+79999999999">+7 999 999 99 99</a>
+    <a href="mailto:snickers@mail.com">snickers@mail.com</a>
+  </div>
+  <div className="footer__column">
+    <h4 className="footer__title">Сервис</h4>
+    <a href="#">Консультации</a>
+    <a href="#">Правила сервиса</a>
+  </div>
+  <div className="footer__column">
+    <h4 className="footer__title">О нас</h4>
+    <a href="#">Блог</a>
+    <a href="#">Галерея</a>
+  </div>
+  <div className="footer__column">
+    <h4 className="footer__title">FAQ</h4>
+    <a href="#">Доставка</a>
+    <a href="#">Оплата</a>
+  </div>
+</div>
+
+  <div className="footer__top">
+        <img className="footer__logo" src={logo} alt="BESTSNICKERS logo" />
+        <div className="footer__socials">
+           <a href="#"><img src={tgLogo} alt="Telegram" /></a>
+          <a href="#"><img src={vkLogo} alt="VK" /></a>
+          <a href="#"><img src={pinterestLogo} alt="Pinterest" /></a>
         </div>
-        <img className="akar-icons-vk-fill" src="akar-icons-vk-fill0.svg" />
-        <img className="mdi-pinterest" src="mdi-pinterest0.svg" />
       </div>
-      <div className="div2">
-        <div className="div3">
-          <div className="div4">Поддержка </div>
-          <div className="_79999999999">+79999999999 </div>
-          <div className="snickers-mail-com">snickers@mail.com </div>
-        </div>
-        <div className="div5">
-          <div className="div6">Сервис </div>
-          <div className="div7">Консультации </div>
-          <div className="div7">Правила сервиса </div>
-        </div>
-        <div className="div8">
-          <div className="div6">О нас </div>
-          <div className="div7">Блог </div>
-          <div className="div7">Галерея </div>
-        </div>
       </div>
-      <div className="div9">
-        <div className="faq">FAQ </div>
-        <div className="div7">Доставка </div>
-        <div className="div7">Оплата </div>
+      <div className="footer__bottom">
+        <p>2018–2024 Ⓒ BESTSNICKERS</p>
       </div>
-    </div>
+    </footer>
   );
-};
+}
