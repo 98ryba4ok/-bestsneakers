@@ -1,0 +1,140 @@
+.cart-page {
+  padding: 50px 100px;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.cart-page h1 {
+  font-size: 36px;
+  font-weight: 300;
+  margin-bottom: 60px;
+  font-family: 'Inter';
+}
+
+.cart-item {
+  background-color: rgba(224, 224, 224, 0.3);
+  margin-bottom: 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+    cursor: pointer;
+}
+
+.cart-image {
+  width: 150px;
+  height: auto;
+   font-family: 'Inter';
+   margin-right: 30px;
+}
+
+.cart-info {
+  
+  white-space: nowrap;
+}
+
+.name {
+  flex: 2;
+  font-size: 18px;
+}
+.price{
+  
+    font-size: 18px;
+    font-weight: 400;
+}
+.size,
+.quantity,
+.price,
+.remove {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quantity button {
+  position: relative;
+  padding: 10px 17px;
+  font-size: 1rem;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  border-radius: 50%;
+  margin: 0 0.5rem;
+  transition: background-color 0.3s;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Кружок за кнопкой */
+.quantity button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120%;
+  height: 120%;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0.5);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  z-index: -1;
+}
+
+.quantity button:hover::before {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+
+.quantity span {
+  min-width: 24px;
+  font-size: 15px;
+  text-align: center;
+}
+
+.remove button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.remove img {
+  width: 25px;
+  height: 25px;
+  transition: transform 0.3s ease;
+}
+
+.remove img:hover {
+transform: scale(1.1);
+}
+
+.cart-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  align-items: center;
+}
+
+.cart-total {
+  font-size: 20px;
+  font-family: 'Inter';
+  font-weight: 500;
+  
+}
+
+.checkout-button {
+  background-color: #111;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.checkout-button:hover {
+   transform: scale(1.05);
+}

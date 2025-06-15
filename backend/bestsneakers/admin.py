@@ -4,6 +4,8 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import CustomGroup
 from django.contrib.auth.admin import GroupAdmin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
+from django.utils.safestring import mark_safe
+
 
 # --- User ---
 class UserAdmin(BaseUserAdmin):
@@ -134,7 +136,7 @@ admin.site.register(Order, OrderAdmin)
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ('user', 'sneaker', 'rating', 'created_at', 'short_comment')
     list_filter = ('created_at', 'rating')
-    search_fields = ('user__username', 'sneaker__name', 'comment')
+    search_fields = ('user__username', 'sneaker__name', 'text')
     list_display_links = ('user',)
     raw_id_fields = ('user', 'sneaker')
     readonly_fields = ('created_at',)
@@ -142,7 +144,9 @@ class ReviewAdmin(admin.ModelAdmin):
 
     @admin.display(description='Comment')
     def short_comment(self, obj):
-        return (obj.comment[:30] + '...') if obj.comment and len(obj.comment) > 30 else obj.comment
+        return (obj.text[:30] + '...') if obj.text and len(obj.text) > 30 else obj.text
+
+    
 
 admin.site.register(Review, ReviewAdmin)
 
@@ -167,6 +171,9 @@ class StockInline(admin.TabularInline):
     extra = 1
     raw_id_fields = ('size',)
 
+class SneakerImageInline(admin.TabularInline):
+    model = SneakerImage
+    extra = 3  # количество пустых форм по умолчанию
 
 class SneakerAdmin(admin.ModelAdmin):
     list_display = ('name', 'brand', 'category', 'price', 'created_at', 'updated_at', 'review_count')
@@ -176,15 +183,43 @@ class SneakerAdmin(admin.ModelAdmin):
     raw_id_fields = ('brand', 'category')
     readonly_fields = ('created_at', 'updated_at')
     date_hierarchy = 'created_at'
-    inlines = [StockInline]
+    inlines = [StockInline,SneakerImageInline]
 
     @admin.display(description='Review Count')
     def review_count(self, obj):
-        return obj.review_set.count()
+        return obj.reviews.count()
 
 admin.site.register(Sneaker, SneakerAdmin)
+
+# --- Main Banner ---
+class MainBannerAdmin(admin.ModelAdmin):
+    list_display = ('title', 'is_active', 'created_at', 'preview')
+    list_filter = ('is_active', 'created_at')
+    search_fields = ('title', 'link')
+    readonly_fields = ('created_at',)
+    date_hierarchy = 'created_at'
+
+    @admin.display(description='Preview')
+    def preview(self, obj):
+        if obj.image:
+            return mark_safe(f'<img src="{obj.image.url}" width="100" height="50" style="object-fit:cover;" />')
+        return "No image"
+
+admin.site.register(MainBanner, MainBannerAdmin)
+
 
 @admin.register(CustomGroup)
 class CustomGroupAdmin(GroupAdmin):
     pass
+
+# --- Privacy Policy ---
+class PrivacyPolicyAdmin(admin.ModelAdmin):
+    list_display = ('title', 'uploaded_at', 'is_active')
+    search_fields = ('title',)
+    list_filter = ('is_active', 'uploaded_at')
+    list_display_links = ('title',)
+    readonly_fields = ('uploaded_at',)
+    date_hierarchy = 'uploaded_at'
+
+admin.site.register(PrivacyPolicy, PrivacyPolicyAdmin)
 

@@ -1,0 +1,56 @@
+.review-form {
+  margin-top: 40px;
+  max-width: 670px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.review-form textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-size: 16px;
+  font-family: "Inter", sans-serif;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  transition: border 0.2s ease;
+}
+
+.review-form textarea:focus {
+  border-color: #000;
+  outline: none;
+  background-color: #fff;
+}
+
+.review-form select {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-family: "Inter", sans-serif;
+  background-color: #f9f9f9;
+}
+
+.review-form select:focus {
+  border-color: #000;
+  outline: none;
+  background-color: #fff;
+}
+
+.review-form button {
+  font-size: 18px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #000;
+  color: white;
+  font-family: "Inter", sans-serif;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  border: none;
+}
+
+.review-form button:hover {
+  transform: scale(1.05);
+}

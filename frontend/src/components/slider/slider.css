@@ -1,0 +1,97 @@
+.sliderWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #fff;
+  gap: 40px;
+}
+
+.thumbs {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.thumb {
+  width: 106px;
+  height: 64px;
+  border-radius: 12px;
+  background: #f3f3f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border 0.2s;
+  font-size: 14px;
+  color: #888;
+}
+
+.thumb.active {
+  border: 2px solid #ff5a1f;
+  color: #ff5a1f;
+  background: #fff6f0;
+}
+
+.placeholder {
+  text-align: center;
+}
+
+.main {
+  position: relative;
+  width: 550px;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bigPlaceholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  background: #e6e6e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: #555;
+  font-weight: 600;
+}
+
+.arrow {
+  position: absolute;
+  right: -40px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #ff5a1f;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.2s;
+}
+.arrow:hover {
+  background: #ff7a3c;
+}
+
+.thumbImg {
+  width: 100%;
+  height: 64px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: #f3f3f3;
+}
+
+.bigImg {
+  width: 100%;
+  height: 220px;
+  object-fit: contain;
+  border-radius: 20px;
+  background: #e6e6e6;
+}

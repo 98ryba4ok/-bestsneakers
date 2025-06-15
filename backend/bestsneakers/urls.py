@@ -9,9 +9,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-
 router = DefaultRouter()
-router.register(r'users', UserViewSet)
 router.register(r'categories', CategoryViewSet)
 router.register(r'brands', BrandViewSet)
 router.register(r'sneakers', SneakerViewSet)
@@ -28,9 +26,7 @@ router.register(r'policies', PrivacyPolicyViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('api/', include('users.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/register/', RegisterView.as_view(), name='register'),
-
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

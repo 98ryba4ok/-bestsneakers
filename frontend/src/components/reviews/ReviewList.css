@@ -1,0 +1,38 @@
+.review-container {
+  margin-top: 60px;
+  max-width: 670px;
+}
+
+.review-item {
+  background-color: #fff;
+  border-radius: 6px;
+  border: 1px solid #e5e5e5;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+}
+
+.review-username {
+  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 6px;
+  font-family: "Inter", sans-serif;
+}
+
+.review-rating {
+  color: #facc15; /* жёлтые звёзды */
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+
+.review-text {
+  font-size: 18px;
+  font-family: "Inter", sans-serif;
+  margin-bottom: 8px;
+}
+
+.review-date {
+  font-size: 14px;
+  color: #999;
+  font-family: "Inter", sans-serif;
+}

@@ -1,0 +1,12 @@
+.Sneakers_grid {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+ 
+}
+h2{
+  font-size: 32px;
+  font-weight: 100;
+  font-family: Inter;
+  margin-bottom: 40px;
+}

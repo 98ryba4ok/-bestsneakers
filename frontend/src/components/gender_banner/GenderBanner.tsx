@@ -1,6 +1,10 @@
 import "./GenderBanner.css";
-
-export default function GenderBanner({ image, buttonText, link }) {
+type GenderBannerProps = {
+  image: string;
+  buttonText: string;
+  link: string;
+};
+export default function GenderBanner({ image, buttonText, link }: GenderBannerProps) {
   return (
   <div className="gender-banner" style={{ backgroundImage: `url(${image})` }}>
   

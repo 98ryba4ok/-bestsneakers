@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.models import Group as AuthGroup
-
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class SneakerQuerySet(models.QuerySet):
     def available(self):
@@ -71,7 +71,7 @@ class Sneaker(models.Model):
         ('F', 'Женский'),
         ('U', 'Унисекс'),
     ]
-        
+
     name = models.CharField(max_length=255, verbose_name="Название")
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='sneakers', verbose_name="Бренд")
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='sneakers', verbose_name="Категория")
@@ -80,9 +80,9 @@ class Sneaker(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default='U', verbose_name="Пол")
     color = models.CharField(max_length=100, verbose_name="Цвет", blank=True, null=True)
     sizes = models.ManyToManyField('Size', through='Stock', related_name='sneakers', verbose_name="Доступные размеры")
-    image = models.ImageField(upload_to='sneakers/', blank=True, null=True, verbose_name="Изображение")
     created_at = models.DateTimeField(default=timezone.now, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
+
     objects = SneakerManager()
 
     class Meta:
@@ -96,6 +96,18 @@ class Sneaker(models.Model):
     def get_absolute_url(self):
         return reverse('sneaker_detail', args=[str(self.id)])
 
+class SneakerImage(models.Model):
+    sneaker = models.ForeignKey(Sneaker, on_delete=models.CASCADE, related_name='images', verbose_name="Кроссовок")
+    image = models.ImageField(upload_to='sneakers/', verbose_name="Изображение")
+    is_main = models.BooleanField(default=False, verbose_name="Основное изображение")
+
+    class Meta:
+        verbose_name = "Изображение кроссовка"
+        verbose_name_plural = "Изображения кроссовок"
+
+    def __str__(self):
+        return f"Изображение для {self.sneaker.name}"
+
 
 class Size(models.Model):
     size = models.DecimalField(max_digits=4, decimal_places=1)
@@ -105,7 +117,7 @@ class Size(models.Model):
         verbose_name_plural = "Размеры"
 
     def __str__(self):
-        return f"{self.sneaker.name} - {self.size}"
+        return str(self.size)
 
 
 class Stock(models.Model):
@@ -184,7 +196,11 @@ class OrderItem(models.Model):
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews', verbose_name="Пользователь")
     sneaker = models.ForeignKey(Sneaker, on_delete=models.CASCADE, related_name='reviews', verbose_name="Кроссовок")
-    rating = models.PositiveIntegerField(verbose_name="Рейтинг")
+    rating = models.PositiveIntegerField( 
+        validators=[
+            MinValueValidator(1, message="Рейтинг не может быть меньше 1."),
+            MaxValueValidator(5, message="Рейтинг не может быть больше 5.")
+        ],verbose_name="Рейтинг")
     text = models.TextField(verbose_name="Текст отзыва")
     created_at = models.DateTimeField(default=timezone.now, verbose_name="Дата создания")
 
@@ -221,7 +237,7 @@ class Payment(models.Model):
 
 class MainBanner(models.Model):
     title = models.CharField(max_length=100, verbose_name="Заголовок")
-    image = models.ImageField(upload_to='banners/', verbose_name="Изображение баннера")
+    image = models.ImageField(upload_to='main_image/', verbose_name="Изображение баннера")
     link = models.URLField(verbose_name="Ссылка при клике")
     is_active = models.BooleanField(default=True, verbose_name="Активен")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
@@ -233,7 +249,6 @@ class MainBanner(models.Model):
     def __str__(self):
         return self.title
 
-from django.db import models
 
 class PrivacyPolicy(models.Model):
     title = models.CharField(max_length=100, default='Политика конфиденциальности', verbose_name="Название документа")

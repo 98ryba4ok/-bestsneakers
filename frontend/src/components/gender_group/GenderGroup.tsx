@@ -7,14 +7,14 @@ export default function GenderGroup() {
     <div className="Banner_container">   
 <GenderBanner
   image={man}
-  buttonText="Женское"
-  link="/women"
+  buttonText="Мужское"
+  link="/men"
 />
 
 <GenderBanner
   image={woman}
-  buttonText="Мужское"
-  link="/men"
+  buttonText="Женское"
+  link="/women"
 />
 </div>
   );

@@ -6,18 +6,9 @@ from .models import *
 from .serializers import *
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import SneakerFilter
-from django.contrib.auth import get_user_model
+from rest_framework import filters
 
-User = get_user_model()
 
-class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [AllowAny]
-
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
@@ -32,18 +23,19 @@ class BrandViewSet(viewsets.ModelViewSet):
 class SneakerViewSet(viewsets.ModelViewSet):
     queryset = Sneaker.objects.all()
     serializer_class = SneakerSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_class = SneakerFilter
+    search_fields = ['name', 'brand__name']
     permission_classes = [AllowAny]
 
     def get_queryset(self):
         qs = Sneaker.objects.select_related('brand')  # подгружаем бренд одним JOIN
-
+        
         # Предзагрузка отзывов отдельным запросом (reviews — related_name для Review)
         qs = qs.prefetch_related('reviews')
 
         # Фильтры и сортировка
-        qs = qs.filter(brand__name='Nike').exclude(price__lt=100).order_by('brand__name', '-price')
+       
 
         # Аннотация среднего рейтинга из отзывов
         qs = qs.annotate(avg_rating=Avg('reviews__rating'))
@@ -62,12 +54,16 @@ class StockViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
 class CartViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
-    permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    def get_queryset(self):
+        return Cart.objects.filter(user=self.request.user)
+
+    def get_serializer_context(self):
+        return {'request': self.request}
+
 
 class OrderItemViewSet(viewsets.ModelViewSet):
     queryset = OrderItem.objects.all()
@@ -104,8 +100,13 @@ class OrderViewSet(viewsets.ModelViewSet):
         return response
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    queryset = Review.objects.all()
+
+    def perform_create(self, serializer):
+        print("USER:", self.request.user)
+        print("DATA:", serializer.validated_data)
+        serializer.save(user=self.request.user)
 
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
@@ -118,3 +119,5 @@ class MainBannerViewSet(viewsets.ModelViewSet):
 class PrivacyPolicyViewSet(viewsets.ModelViewSet):
     queryset = PrivacyPolicy.objects.all()
     serializer_class = PrivacyPolicySerializer
+
+

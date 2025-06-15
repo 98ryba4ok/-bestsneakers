@@ -10,13 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "axios": "^1.9.0",
+    "lodash.debounce": "^4.0.8",
     "modern-normalize": "^3.0.1",
     "normalize.css": "^8.0.1",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.6.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",
+    "@types/lodash.debounce": "^4.0.9",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@typescript-eslint/eslint-plugin": "^8.32.1",

@@ -1,42 +1,49 @@
 from rest_framework import serializers
 from .models import (
      Category, Brand, Sneaker, Size, Stock, Cart, Order,
-    OrderItem, Review, Payment, MainBanner, PrivacyPolicy
+    OrderItem, Review, Payment, MainBanner, PrivacyPolicy, SneakerImage
 )
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = '__all__'
-
+from users.serializers import UserSerializer 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
 
+class SneakerImageSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True)
+
+    class Meta:
+        model = SneakerImage
+        fields = ['id', 'image', 'is_main']
 
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
         fields = '__all__'
-
+        
+class SizeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Size
+        fields = '__all__'
 
 class SneakerSerializer(serializers.ModelSerializer):
     avg_rating = serializers.FloatField(read_only=True)
+    images = SneakerImageSerializer(many=True, read_only=True)
+    sizes = serializers.SerializerMethodField()
 
     class Meta:
         model = Sneaker
         fields = '__all__'
 
+    def get_sizes(self, obj):
+        sizes = obj.sizes.all().order_by('size')  # сортировка по числовому значению
+        return SizeSerializer(sizes, many=True).data
 
-class SizeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Size
-        fields = '__all__'
+
+
+
+
 
 
 class StockSerializer(serializers.ModelSerializer):
@@ -46,9 +53,16 @@ class StockSerializer(serializers.ModelSerializer):
 
 
 class CartSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField() 
     class Meta:
         model = Cart
-        fields = '__all__'
+        fields = '__all__'  # или перечисли явно
+        read_only_fields = ('user',)
+        
+
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -66,9 +80,11 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)  # вложенный пользователь
+
     class Meta:
         model = Review
-        fields = '__all__'
+        fields = ['id', 'rating', 'text', 'created_at', 'user', 'sneaker']
 
 
 class PaymentSerializer(serializers.ModelSerializer):
@@ -86,4 +102,9 @@ class MainBannerSerializer(serializers.ModelSerializer):
 class PrivacyPolicySerializer(serializers.ModelSerializer):
     class Meta:
         model = PrivacyPolicy
+        fields = '__all__'
+
+class MainBannerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MainBanner
         fields = '__all__'

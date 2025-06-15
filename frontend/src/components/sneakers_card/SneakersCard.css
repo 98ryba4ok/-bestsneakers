@@ -1,0 +1,49 @@
+.Sneakers_card {
+  width: 320px;
+  height: 406px;
+  background-color: rgba(224, 224, 224, 0.3);
+  font-family: 'Inter';
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  padding: 0px 15px 34px 15px;
+  box-sizing: border-box;
+  justify-content: space-between;
+  border-radius: 8px;
+}
+
+/* Центрируем изображение */
+.Sneakers_image {
+  width: 256px;
+  height: 160px;
+  object-fit: contain;
+  margin-bottom: 50px;
+}
+
+/* Текст слева */
+.Sneakers_text {
+  align-self: flex-start;
+}
+
+h3{
+font-size: 24px;
+font-weight: 400;
+margin-bottom: 22px;
+}
+h4{
+font-size: 24px;
+font-weight: 500;
+}
+
+.Sneakers_button {
+  width: 175px;
+  height: 36px;
+  background-color: #000;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  margin-top: auto;
+}

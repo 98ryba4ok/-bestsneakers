@@ -1,0 +1,187 @@
+.SneakerPage {
+  display: flex;
+  flex-direction: column;
+  padding: 220px 100px 0;
+}
+
+.Main_container {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* === СЛАЙДЕР === */
+.SneakerPage_slider {
+  display: flex;
+  gap: 128px;
+}
+
+.SneakerPage_thumbnails-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.SneakerPage_thumbnail {
+  width: 105px;
+  height: 105px;
+   object-fit:contain;
+  cursor: pointer;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: border-color 0.3s ease;
+}
+
+.SneakerPage_thumbnail.active {
+  border-color: #000;
+}
+
+
+.SneakerPage_image {
+  width: 550px;
+  height: 475px;
+  object-fit:contain;
+
+}
+.SneakerPage_mainImageWrapper {
+  position: relative;
+}
+
+/* Обёртка стрелки — абсолютное позиционирование */
+.SneakerPage_arrow_wrapper {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  z-index: 2;
+}
+
+/* Левая стрелка — слева от изображения */
+.SneakerPage_arrow_wrapper.left {
+  left: -50px;
+}
+
+/* Правая стрелка — справа от изображения */
+.SneakerPage_arrow_wrapper.right {
+  right: -50px;
+}
+
+/* Кружок-подсветка */
+.SneakerPage_arrow_wrapper::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.3s ease;
+  z-index: 1;
+}
+
+.SneakerPage_arrow_wrapper:hover::before {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Стрелка */
+.SneakerPage_arrow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  opacity: 0.8;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 2;
+}
+
+
+
+
+/* === ИНФОРМАЦИЯ О КРОССОВКЕ === */
+
+.SneakerPage_info {
+  width: 433px;
+}
+
+.SneakerPage_info h2 {
+  font-size: 35px;
+  max-width: 420px;
+  margin-left: 5px;
+}
+
+.SneakerPage_price {
+  font-size: 32px;
+  font-weight: 500;
+  font-family: "Inter";
+}
+
+.SneakerPage_sizes p {
+  font-size: 24px;
+  font-family: "Inter";
+  font-weight: 500;
+  margin: 40px 0 30px;
+}
+
+.sneaker-sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px 20px; /* вертикальный 15px, горизонтальный 20px */
+  margin-bottom: 80px;
+}
+
+.size-button {
+  font-size: 20px;
+  font-family: "Inter";
+  font-weight: 500;
+  background: #E0E0E0;
+  border: 0;
+  border-radius: 4px;
+  width: 92px;
+  height: 49px;
+  cursor: pointer;
+  transition: border 0.3s ease;
+  transition: transform 0.3s ease;
+}
+.size-button:hover {
+  transform: scale(1.07);
+}
+.size-button.selected {
+  border: 1px solid #000;
+}
+
+.SneakerPage_button {
+  font-size: 24px;
+  width: 425px;
+  height: 63px;
+  background-color: #000;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+
+}
+.SneakerPage_button:hover {
+  transform: scale(1.05);
+}
+/* === ОПИСАНИЕ === */
+
+.description_header {
+  margin: 40px 0 30px;
+  font-size: 36px;
+  font-weight: 400;
+  font-family: "Inter";
+}
+
+.descripton_text {
+  font-size: 24px;
+  font-weight: 100;
+  max-width: 670px;
+  color: #000;
+  font-family: "Inter";
+  white-space: pre-wrap;
+}
