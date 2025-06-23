@@ -4,7 +4,7 @@ from django.db import transaction
 
 from .models import (
      Category, Brand, Sneaker, Size, Stock, Cart, Order,
-    OrderItem, Review, Payment, MainBanner, PrivacyPolicy, SneakerImage, Stock
+    OrderItem, Review, Payment, MainBanner, PrivacyPolicy, SneakerImage, Stock, elexam
 )
 from users.serializers import UserSerializer 
 
@@ -257,3 +257,10 @@ class FilterOptionsSerializer(serializers.Serializer):
         child=serializers.DictField(child=serializers.CharField())
     )
     sizes = serializers.ListField(child=serializers.CharField())
+
+class ElexamSerializer(serializers.ModelSerializer):
+    participants = UserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = elexam
+        fields = '__all__'

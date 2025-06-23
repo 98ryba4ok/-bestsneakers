@@ -176,3 +176,7 @@ class FilterOptionsView(APIView):
         serializer = FilterOptionsSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class ElexamViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = elexam.objects.filter(is_public=True).order_by('-exam_date')
+    serializer_class = ElexamSerializer

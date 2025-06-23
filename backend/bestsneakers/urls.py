@@ -24,6 +24,7 @@ router.register(r'payments', PaymentViewSet)
 router.register(r'banners', MainBannerViewSet)
 router.register(r'policies', PrivacyPolicyViewSet)
 router.register(r'checkout', CheckoutViewSet, basename='checkout')
+router.register(r'elexams', ElexamViewSet, basename='elexam')
 
 
 urlpatterns = [

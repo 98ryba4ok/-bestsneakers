@@ -252,3 +252,10 @@ class PrivacyPolicyAdmin(admin.ModelAdmin):
 
 admin.site.register(PrivacyPolicy, PrivacyPolicyAdmin)
 
+
+@admin.register(elexam)
+class ehexamAdmin(admin.ModelAdmin):
+    list_display = ('name', 'exam_date', 'created_at', 'is_public')
+    list_filter = ('is_public', 'created_at', 'exam_date')
+    search_fields = ('name', 'participants__email')
+    filter_horizontal = ('participants',)

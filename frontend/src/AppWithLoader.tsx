@@ -18,6 +18,7 @@ import CheckoutPage from './components/checkout_page/CheckoutPage';
 import RecentReviews from './components/reviews/RecentReviews';
 import TestButton from './components/testtoast';
 import AdminPanel from './components/AdminPanel/AdminPanel';
+import  ElexamPage  from './components/elexams/ElexamPage'; 
 export default function AppWithLoader() {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
@@ -55,6 +56,7 @@ return (
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/catalog" element={<SneakersCatalog />} />
         <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/elexam" element={<ElexamPage />} />
       </Routes>
     </main>
     <Footer />
