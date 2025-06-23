@@ -22,7 +22,7 @@ from rest_framework.permissions import IsAdminUser
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [AllowAny]  # Только для админов
+    permission_classes = [IsAdminUser]
 
 
 class LoginView(APIView):
@@ -55,30 +55,27 @@ class ProfileView(APIView):
             'email': request.user.email,
             'phone': request.user.phone,
             'address': request.user.address,
+            'first_name': request.user.first_name,
+            'last_name': request.user.last_name,
+            'is_superuser': request.user.is_superuser,
         })
 
     def put(self, request):
         user = request.user
-        username = request.data.get('username')
-        email = request.data.get('email')
-        phone = request.data.get('phone')
-        address = request.data.get('address')
-
-        if username:
-            user.username = username
-        if email:
-            user.email = email
-        if phone:
-            user.phone = phone
-        if address:
-            user.address = address
+        for field in ['username', 'email', 'phone', 'address', 'first_name', 'last_name']:
+            value = request.data.get(field)
+            if value is not None:
+                setattr(user, field, value)
 
         user.save()
+
         return Response({
             'username': user.username,
             'email': user.email,
             'phone': user.phone,
             'address': user.address,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
         })
 
     def delete(self, request):

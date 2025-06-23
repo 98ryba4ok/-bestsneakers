@@ -154,6 +154,9 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders', verbose_name="Пользователь")
     total_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Общая сумма")
     created_at = models.DateTimeField(default=timezone.now, verbose_name="Дата создания")
+    full_name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=20)
+    address = models.TextField()
     status = models.CharField(
         max_length=50,
         choices=[('pending', 'Ожидание'), ('shipped', 'Отправлен'), ('delivered', 'Доставлен')],

@@ -1,0 +1,108 @@
+.recent-reviews {
+  margin-top: 60px;
+  padding: 0 40px;
+  max-width: 1200px;
+  
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.recent-reviews h2 {
+  font-size: 28px;
+  margin-bottom: 24px;
+  font-family: "Inter", sans-serif;
+}
+
+.average-rating {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 20px;
+  font-family: "Inter", sans-serif;
+}
+
+.average-rating span {
+  color: #facc15;
+  font-weight: 600;
+}
+
+.recent-reviews-wrapper {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.recent-review-item {
+  background-color: #fff;
+  border-left: 5px solid #facc15;
+  padding: 16px 20px;
+  border-radius: 10px;
+min-width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.recent-review-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.recent-review-username {
+  font-weight: 600;
+  font-size: 17px;
+  margin-bottom: 6px;
+  font-family: "Inter", sans-serif;
+  color: #111;
+}
+
+.recent-review-rating {
+  color: #facc15;
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+.recent-review-text {
+  font-size: 15px;
+  line-height: 1.4;
+  color: #333;
+  font-family: "Inter", sans-serif;
+  margin-bottom: 8px;
+}
+
+.recent-review-date {
+  font-size: 13px;
+  color: #999;
+  font-family: "Inter", sans-serif;
+  margin-top: auto;
+}
+
+/* 📱 Адаптивность */
+@media (max-width: 1024px) {
+  .recent-review-item {
+    width: calc(50% - 12px); /* 2 в ряд */
+  }
+}
+
+@media (max-width: 640px) {
+  .recent-review-item {
+    width: 100%; /* 1 в ряд */
+  }
+
+  .recent-reviews {
+    padding: 0 16px;
+  }
+
+  .recent-reviews h2 {
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+
+  .average-rating {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+}

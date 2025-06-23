@@ -1,7 +1,30 @@
-.main_image{
-    width: 1114px;
-    height: 533px;
-    border-radius: 8px;
-    margin-top: 65px;
-    margin-bottom: 45px;
+.main_image {
+  width: 100%;              /* Занимает всю ширину контейнера */
+  max-width: 1114px;        /* Максимальная ширина по дизайну */
+  height: auto;             /* Высота подстраивается под содержимое */
+  border-radius: 8px;
+  margin: 65px auto 45px;   /* Центрируем блок с отступами сверху и снизу */
+  overflow: hidden;         /* Чтобы скругление не ломалось */
+  box-sizing: border-box;   /* Чтобы паддинги/бордеры не ломали размер */
+}
+
+.main_image_img {
+  width: 100%;              /* Картинка занимает всю ширину блока */
+  height: auto;             /* Высота пропорциональна ширине */
+  display: block;           /* Убираем нижние отступы под img */
+  border-radius: 8px;       /* Скругляем углы картинки, совпадает с контейнером */
+}
+
+/* Медиа-запрос для маленьких экранов <= 480px */
+@media (max-width: 480px) {
+  .main_image {
+    margin-top: 40px;
+    margin-bottom: 30px;
+    max-width: 80%;        /* На маленьких экранах ограничиваем ширину */
+    border-radius: 6px;
+  }
+  
+  .main_image_img {
+    border-radius: 6px;
+  }
 }

@@ -1,0 +1,99 @@
+.user-orders {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 0 15px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #222;
+}
+
+.user-orders h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-weight: 700;
+  font-size: 2rem;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.order-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background: #fafafa;
+  box-shadow: 0 1px 5px rgb(0 0 0 / 0.1);
+}
+
+.order-card h3 {
+  margin: 0 0 10px 0;
+  font-weight: 700;
+  color: #333;
+}
+
+.order-card p {
+  margin: 5px 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.order-items-list {
+  list-style: none;
+  padding: 10px 0 0 0;
+  margin: 15px 0 0 0;
+  border-top: 1px solid #ccc;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.order-item__left {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  margin-right: 15px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: transparent;
+  
+}
+
+.order-item__image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.order-item__right {
+  flex-grow: 1;
+}
+
+.order-item__name {
+  margin: 0 0 6px 0;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #222;
+}
+
+.order-item__details {
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.revenue {
+  margin-top: 40px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #1a7f1a;
+}

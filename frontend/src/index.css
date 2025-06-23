@@ -1,13 +1,6 @@
-:root {
- 
-
-
-}
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
 
-body {
-  font-family: 'Open Sans', sans-serif;
-}
+
 
 /*! modern-normalize v3.0.1 | MIT License | https://github.com/sindresorhus/modern-normalize */
 
@@ -225,4 +218,8 @@ Add the correct display in Chrome and Safari.
 
 summary {
 	display: list-item;
+}
+body {
+  font-family: 'Open Sans', sans-serif;
+  margin-top: 100px;
 }

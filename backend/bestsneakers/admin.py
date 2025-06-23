@@ -5,7 +5,9 @@ from .models import CustomGroup
 from django.contrib.auth.admin import GroupAdmin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.utils.safestring import mark_safe
-
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from io import BytesIO
 
 # --- User ---
 class UserAdmin(BaseUserAdmin):
@@ -125,12 +127,39 @@ class OrderAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at',)
     date_hierarchy = 'created_at'
     inlines = [OrderItemInline]
+    actions = ['download_orders_pdf']  # 👈 Добавили действие
 
     @admin.display(description='Item Count')
     def item_count(self, obj):
         return obj.items.count()
 
+    def download_orders_pdf(self, request, queryset):
+        buffer = BytesIO()
+        p = canvas.Canvas(buffer)
+
+        y = 800
+        for order in queryset:
+            p.drawString(100, y, f"Order ID: {order.id}, User: {order.user.username}, Total: {order.total_price}₽")
+            y -= 20
+            for item in order.items.all():
+                p.drawString(120, y, f"- {item.sneaker.name}, Size: {item.size}, Qty: {item.quantity}")
+                y -= 15
+            y -= 10
+            if y < 100:
+                p.showPage()
+                y = 800
+
+        p.showPage()
+        p.save()
+
+        buffer.seek(0)
+        return HttpResponse(buffer, content_type='application/pdf')
+
+    download_orders_pdf.short_description = "Скачать выбранные заказы в PDF"
+
 admin.site.register(Order, OrderAdmin)
+
+
 
 # --- Review ---
 class ReviewAdmin(admin.ModelAdmin):

@@ -1,45 +1,58 @@
-header{
-    height: 100px;
-    background-color: #fff;
+/* Reset и базовые стили */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 100px;
+  background-color: #fff;
   box-shadow: 0 3px 30px rgba(0, 0, 0, 0.2);
-
-    
+  width: 100%;
 }
+
 .headerCenter {
+  max-width: 1440px;
+  margin: 0 auto;
   height: 100px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 100px 0 20px;
+  padding: 0 60px 0 20px;
   gap: 40px;
 }
+
+.logo {
+  width: 200px;
+  height: auto;
+}
+
 .navWrapper {
   flex: 1;
   display: flex;
   justify-content: center;
+  gap: 80px;
+  font-weight: 300;
 }
 
-.logo{
-    width: 275px;
-    height: 100px;
+.navLink {
+  text-decoration: none;
+  color: #000;
+  font-size: 20px;
+  white-space: nowrap;
 }
-nav{
-    display: flex;
-    gap: 140px;
-    align-items: center;
-    padding: 0 20px;
-    font-weight: 300;
-    
+
+.navButtons {
+  display: flex;
+  margin-left: auto;
+  gap: 20px;
+  align-items: center;
 }
-.navLink{
-    text-decoration: none;
-    color: #000;
-    font-size: 20px;
-}
+
 .navButtons button {
-  background-color: transparent; /* вместо none */
+  background-color: transparent;
   border: none;
-  padding: 0; /* убираем лишние отступы */
+  padding: 0;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -47,32 +60,187 @@ nav{
 }
 
 .navButtons button img {
-  width: 35px; /* можно подогнать под нужный размер */
-  height: 35px;
+  width: 32px;
+  height: 32px;
   object-fit: contain;
-}
-.navButtons{
-    display: flex;
-    margin-left: auto;
-    gap: 20px;
 }
 
 .cart-button {
   position: relative;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
 }
 
 .cart-count {
   position: absolute;
-  top: -6px;
-  right: -6px;
-  background: red;
+  top: -9px;
+  right: -10px;
+  background: rgba(0, 0, 0, 0.65);
   color: white;
   font-size: 12px;
   padding: 2px 6px;
   border-radius: 50%;
   font-weight: bold;
+}
+
+/* ===== Бургер кнопка ===== */
+.burger-button {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px;
+  height: 22px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 10px;
+  z-index: 1100;
+}
+
+.burger-button span {
+  display: block;
+  height: 3px;
+
+  background-color: black;
+  opacity: 0.6;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  z-index: 1100;
+}
+
+ .burger-button.open{
+   gap:0;
+ }
+.burger-button.open span:nth-child(1) {
+  
+  transform: translateY(9.5px) rotate(45deg);
+}
+
+.burger-button.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.burger-button.open span:nth-child(3) {
+  transform: translateY(-9.5px) rotate(-45deg);
+}
+
+/* ===== Мобильное меню overlay ===== */
+.mobileMenuOverlay {
+  position: fixed;
+  top: 100px; /* под header */
+  right: 0;
+  width: 0;
+  height: calc(100vh - 100px);
+  background-color: white;
+  box-shadow: -3px 0 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: width 0.3s ease;
+  z-index: 1050;
+}
+
+.mobileMenuOverlay.open {
+  width: 250px;
+}
+
+.mobileNav {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 20px;
+}
+
+.mobileNav a {
+  text-decoration: none;
+  color: #000;
+  font-weight: 500;
+  font-size: 18px;
+  white-space: nowrap;
+}
+
+/* ===== Медиа-запросы ===== */
+
+/* <= 1440px */
+@media (max-width: 1440px) {
+  .headerCenter {
+    padding: 0 40px;
+    gap: 20px;
+  }
+
+  .navWrapper {
+    gap: 50px;
+  }
+
+  .logo {
+    width: 180px;
+  }
+}
+
+/* <= 1024px */
+@media (max-width: 1024px) {
+  .navLink {
+    font-size: 18px;
+  }
+
+  .navWrapper {
+    gap: 30px;
+  }
+
+  .logo {
+    width: 160px;
+  }
+}
+
+/* <= 768px — мобильная версия */
+@media (max-width: 768px) {
+  .navWrapper {
+    display: none; /* скрываем обычное меню */
+  }
+
+  .burger-button {
+    display: flex; /* показываем бургер */
+    gap: 3px;
+      width: 20px;
+  }
+   .burger-button  span{
+ 
+      width: 20px;
+  }
+
+  .logo {
+    width: 140px;
+  }
+
+  .navButtons {
+    gap: 10px;
+  }
+
+  .navButtons button img {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* <= 480px */
+@media (max-width: 480px) {
+  .logo {
+    width: 120px;
+  }
+  header{
+    height: 60px;
+  }
+  .navButtons button img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .cart-count {
+    font-size: 10px;
+    padding: 1px 5px;
+    top: -7px;
+    right: -8px;
+  }
+
+  .headerCenter {
+    padding: 10px 20px;
+    height: 60px;
+  }
 }

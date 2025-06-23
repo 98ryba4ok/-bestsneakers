@@ -1,7 +1,7 @@
 .SneakerPage {
   display: flex;
   flex-direction: column;
-  padding: 220px 100px 0;
+  padding: 120px 100px 0;
 }
 
 .Main_container {
@@ -168,6 +168,21 @@
 .SneakerPage_button:hover {
   transform: scale(1.05);
 }
+.SneakerPage_adminButton{
+  margin-top: 20px;
+  font-size: 24px;
+  width: 425px;
+  height: 63px;
+  background-color: #000;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+.SneakerPage_adminButton:hover {
+  transform: scale(1.05);
+}
 /* === ОПИСАНИЕ === */
 
 .description_header {
@@ -184,4 +199,130 @@
   color: #000;
   font-family: "Inter";
   white-space: pre-wrap;
+}
+/* Планшеты (768px — 1024px) */
+@media (max-width: 1024px) {
+  .SneakerPage {
+    padding: 150px 50px 0;
+  }
+  
+  .Main_container {
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .SneakerPage_slider {
+    gap: 40px;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .SneakerPage_image {
+    width: 100%;
+    max-width: 450px;
+    height: auto;
+  }
+
+  .SneakerPage_info {
+    width: 100%;
+    max-width: 450px;
+  }
+
+  .SneakerPage_thumbnails-vertical {
+    flex-direction: row;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .SneakerPage_thumbnail {
+    width: 80px;
+    height: 80px;
+  }
+
+  .SneakerPage_arrow_wrapper.left {
+    left: 10px;
+  }
+
+  .SneakerPage_arrow_wrapper.right {
+    right: 10px;
+  }
+}
+
+/* Мобильные устройства (до 767px) */
+@media (max-width: 767px) {
+  .SneakerPage {
+    padding: 100px 20px 0;
+  }
+
+  .Main_container {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .SneakerPage_slider {
+    flex-direction: column;
+    gap: 30px;
+    align-items: center;
+  }
+
+  .SneakerPage_image {
+    width: 100%;
+    max-width: 350px;
+    height: auto;
+  }
+
+  .SneakerPage_info {
+    width: 100%;
+    max-width: 350px;
+  }
+
+  .SneakerPage_thumbnails-vertical {
+    flex-direction: row;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .SneakerPage_thumbnail {
+    width: 60px;
+    height: 60px;
+  }
+
+  .SneakerPage_button, .SneakerPage_adminButton {
+    width: 100%;
+    font-size: 20px;
+    height: 50px;
+  }
+
+  .size-button {
+    width: 70px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .SneakerPage_price {
+    font-size: 24px;
+  }
+
+  .SneakerPage_info h2 {
+    font-size: 24px;
+    max-width: 100%;
+    margin-left: 0;
+  }
+
+  .description_header {
+    font-size: 28px;
+  }
+
+  .descripton_text {
+    font-size: 18px;
+    max-width: 100%;
+  }
+
+  .SneakerPage_arrow_wrapper.left {
+    left: 5px;
+  }
+
+  .SneakerPage_arrow_wrapper.right {
+    right: 5px;
+  }
 }

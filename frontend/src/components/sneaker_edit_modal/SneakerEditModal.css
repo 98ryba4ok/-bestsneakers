@@ -1,0 +1,88 @@
+/* SneakerEditModal.css */
+
+.modal_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal_content {
+  background: white;
+  border-radius: 12px;
+  width: 420px;
+  max-width: 90vw;
+  padding: 30px 40px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal_content h2 {
+  margin: 0 0 20px 0;
+  font-weight: 600;
+  text-align: center;
+  font-size: 1.8rem;
+}
+
+.modal_content input,
+.modal_content textarea,
+.modal_content select {
+  margin-bottom: 15px;
+  padding: 10px 12px;
+  font-size: 1rem;
+  border: 1.8px solid #ccc;
+  border-radius: 6px;
+  font-family: inherit;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.modal_content input:focus,
+.modal_content textarea:focus,
+.modal_content select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.modal_content textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.modal_buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.modal_buttons button {
+  flex: 1;
+  padding: 10px 0;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  font-weight: 600;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.modal_buttons button:hover {
+  background-color: #0056b3;
+}
+
+.modal_buttons button.danger {
+  background-color: #dc3545;
+}
+
+.modal_buttons button.danger:hover {
+  background-color: #a71d2a;
+}

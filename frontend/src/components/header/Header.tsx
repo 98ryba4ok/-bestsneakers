@@ -8,13 +8,13 @@ import userProfile from "../../assets/userProfile.png";
 import AuthModal from "../register_form/AuthModal";
 import { useCart } from "../../CartContext";
 import SearchBox from "../search_box/SearchBox";
-// ...остальной импорт
 
 export default function Header() {
   const navigate = useNavigate();
   const [showAuth, setShowAuth] = useState(false);
-  const [user, setUser] = useState<{ username: string } | null>(null);
-  const [showSearch, setShowSearch] = useState(false); // ← добавили
+  const [user, setUser] = useState(null);
+  const [showSearch, setShowSearch] = useState(false);
+  const [burgerOpen, setBurgerOpen] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -40,39 +40,82 @@ export default function Header() {
 
   const toggleSearch = () => setShowSearch((prev) => !prev);
 
+  const toggleBurger = () => setBurgerOpen((prev) => !prev);
+
+  // Закрыть меню при клике по ссылке
+  const onNavClick = () => setBurgerOpen(false);
+
   return (
     <>
       <header className="header">
         <div className="headerCenter">
-          <Link to="/">
+          <Link to="/" className="logoLink">
             <img className="logo" src={logo} alt="Logo" />
           </Link>
 
-          <nav className="navWrapper">
-            <Link className="navLink" to="/catalog">Каталог</Link>
-            <Link className="navLink" to="/news">Новости</Link>
-            <Link className="navLink" to="/gallery">Галерея</Link>
-            <Link className="navLink" to="/about">О нас</Link>
+          {/* Навигация - большая версия */}
+          <nav className={`navWrapper ${burgerOpen ? "open" : ""}`}>
+            <Link className="navLink" to="/catalog" onClick={onNavClick}>
+              Каталог
+            </Link>
+            <Link className="navLink" to="/news" onClick={onNavClick}>
+              Новости
+            </Link>
+            <Link className="navLink" to="/gallery" onClick={onNavClick}>
+              Галерея
+            </Link>
+            <Link className="navLink" to="/about" onClick={onNavClick}>
+              О нас
+            </Link>
           </nav>
 
-          {user && (
-            <div className="userInfo">
-              <p>Привет, {user.username}!</p>
-            </div>
-          )}
-
+          {/* Кнопки справа */}
           <div className="navButtons">
-            <button onClick={toggleSearch}>
-              <img src={search} alt="Поиск" />
+            <button onClick={toggleSearch} aria-label="Поиск">
+              <img src={search} alt="" />
             </button>
-            <button onClick={handleUserClick}>
-              <img src={userProfile} alt="Профиль" />
+            <button onClick={handleUserClick} aria-label="Профиль">
+              <img src={userProfile} alt="" />
             </button>
-            <button className="cart-button" onClick={() => navigate("/cart")}>
-              <img src={cart} alt="Корзина" />
+            <button
+              className="cart-button"
+              onClick={() => navigate("/cart")}
+              aria-label="Корзина"
+            >
+              <img src={cart} alt="" />
               {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
             </button>
+
+            {/* Бургер кнопка для мобильных */}
+            <button
+              className={`burger-button ${burgerOpen ? "open" : ""}`}
+              onClick={toggleBurger}
+              aria-label="Меню"
+            >
+              <span />
+             
+              <span />
+              <span />
+            </button>
           </div>
+        </div>
+
+        {/* Мобильное меню - выдвижное */}
+        <div className={`mobileMenuOverlay ${burgerOpen ? "open" : ""}`}>
+          <nav className="mobileNav">
+            <Link to="/catalog" onClick={onNavClick}>
+              Каталог
+            </Link>
+            <Link to="/news" onClick={onNavClick}>
+              Новости
+            </Link>
+            <Link to="/gallery" onClick={onNavClick}>
+              Галерея
+            </Link>
+            <Link to="/about" onClick={onNavClick}>
+              О нас
+            </Link>
+          </nav>
         </div>
 
         {showSearch && (

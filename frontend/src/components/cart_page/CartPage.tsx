@@ -7,16 +7,20 @@ import trashIcon from '../../assets/trash-bin.png';
 import { useNavigate } from "react-router-dom";
 
 type CartItem = {
-  id: number; 
+  id: number;
   sneaker: number;
-  size: number;
+  size: {
+    id: number;
+    size: number;
+  };
   quantity: number;
 };
+
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [sneakersData, setSneakersData] = useState<Record<number, Sneaker>>({});
-  const [userId, setUserId] = useState<number | null>(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,8 +30,7 @@ export default function CartPage() {
       // Загрузить профиль и корзину с сервера
       axios.get("http://localhost:8000/api/profile/", {
         headers: { Authorization: `Token ${token}` }
-      }).then(res => {
-        setUserId(res.data.id);
+      }).then(() => {
 
         // Теперь загрузить корзину
         return axios.get("http://localhost:8000/api/cart/", {
@@ -38,7 +41,7 @@ export default function CartPage() {
         setCartItems(res.data); // Предполагаем, что сервер отдаёт массив CartItem
       })
       .catch(() => {
-        setUserId(null);
+       
         // fallback — локалка
         const cart = getCart();
         setCartItems(cart);
@@ -132,6 +135,8 @@ axios.patch(`http://localhost:8000/api/cart/${item.id}/`, { quantity: item.quant
       ) : (
         <>
           {cartItems.map((item, index) => {
+            console.log("item.size:", item.size);
+
             const sneaker = sneakersData[item.sneaker];
             if (!sneaker) return null;
 
@@ -141,7 +146,7 @@ axios.patch(`http://localhost:8000/api/cart/${item.id}/`, { quantity: item.quant
               <div key={index} className="cart-item" onClick={() => handleClick(sneaker.id)}>
                 <img src={mainImage} alt={sneaker.name} className="cart-image" />
                 <div className="cart-info name">{sneaker.name}</div>
-                <div className="cart-info size">{item.size} EU</div>
+                <div className="cart-info size">{item.size.size} EU</div>
                 <div className="cart-info quantity">
                   <button onClick={(e) => { e.stopPropagation(); updateQuantity(index, -1); }}>-</button>
                   <span>{item.quantity}</span>
@@ -158,7 +163,9 @@ axios.patch(`http://localhost:8000/api/cart/${item.id}/`, { quantity: item.quant
           })}
           <div className="cart-footer">
             <div className="cart-total">Итого: {totalPrice} ₽</div>
-            <button className="checkout-button">Оформить заказ</button>
+            <button className="checkout-button" onClick={() => navigate('/checkout')}>
+  Оформить заказ
+</button>
           </div>
         </>
       )}

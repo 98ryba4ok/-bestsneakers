@@ -1,9 +1,9 @@
-// src/components/SneakerList.jsx
-import  { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import SneakersCard from '../sneakers_card/SneakersCard';
-import './SneakerList.css'; // по желанию
+import './SneakerList.css';
 import type { Sneaker } from '../../types/Sneaker';
+
 export default function SneakerList() {
   const [sneakers, setSneakers] = useState<Sneaker[]>([]);
 
@@ -14,13 +14,18 @@ export default function SneakerList() {
   }, []);
 
   return (
-    <div>
-      <h2>Новая коллекция</h2>
-    <div className="Sneakers_grid">
-      {sneakers.map(sneaker => (
-        <SneakersCard key={sneaker.id} sneaker={sneaker} />
-      ))}
-    </div>
-    </div>
+   <div className="sneaker-slider-wrapper">
+  <h2 className='otstup'>Новая коллекция</h2>
+  <div className="sneaker-slider">
+    <div className="sneaker-slide spacer" /> {/* Пустой слайд для отступа */}
+    {sneakers.map(sneaker => (
+      <div className="sneaker-slide" key={sneaker.id}>
+        <SneakersCard sneaker={sneaker} />
+      </div>
+    ))}
+  </div>
+</div>
+
+
   );
 }

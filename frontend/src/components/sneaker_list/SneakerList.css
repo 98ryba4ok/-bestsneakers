@@ -1,12 +1,56 @@
-.Sneakers_grid {
-  display: flex;
-  flex-direction: row;
-  gap: 20px;
- 
-}
-h2{
+h2 {
   font-size: 32px;
   font-weight: 100;
-  font-family: Inter;
-  margin-bottom: 40px;
+  font-family: Inter, sans-serif;
+  margin-bottom: 20px;
+
+}
+.otstup{
+  margin-left: 100px;
+}
+.sneaker-slider-wrapper {
+  overflow-x: hidden; /* чтобы страница не скроллилась */
+  width: 100%;
+}
+
+/* Слайдер */
+.sneaker-slider {
+  display: flex;
+  flex-direction: row;
+  gap: 22px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 10px 16px 30px 0; /* без левого паддинга! */
+  box-sizing: border-box;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+}
+
+.sneaker-slider::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Пустой "слайд" для отступа */
+.sneaker-slide.spacer {
+  flex: 0 0 80px; /* ширина отступа */
+  pointer-events: none; /* чтобы не мешал кликам */
+  scroll-snap-align: start;
+}
+
+/* Карточки */
+.sneaker-slide {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+@media (max-width: 600px) {
+ .otstup{
+  margin-left: 35px;
+}
+.sneaker-slide.spacer {
+  flex: 0 0 15px; /* ширина отступа */
+  pointer-events: none; /* чтобы не мешал кликам */
+  scroll-snap-align: start;
+}
 }

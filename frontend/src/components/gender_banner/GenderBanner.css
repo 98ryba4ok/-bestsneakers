@@ -33,3 +33,97 @@
   background-color: rgba(255, 255, 255, 1);
 }
 
+@media (max-width: 600px) {
+ .gender-banner {
+  display: flex;
+  justify-content: center; /* горизонтальное центрирование */
+  align-items: flex-end;   /* кнопка у нижнего края */
+  position: relative;
+  overflow: hidden;
+  width: 400px;
+  height: 588px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  padding-bottom: 33px;
+}
+
+.gender-banner__button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 250px;
+  padding: 10px 20px;
+  background-color: #E0E0E0;
+  opacity: 0.7;
+  color: #000;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 300;
+  font-size: 20px;
+  transition: background-color 0.3s ease;
+}
+}
+
+
+@media (max-width: 800px) {
+ .gender-banner {
+  display: flex;
+  justify-content: center; /* горизонтальное центрирование */
+  align-items: flex-end;   /* кнопка у нижнего края */
+  position: relative;
+  overflow: hidden;
+  width: 400px;
+  height: 588px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  padding-bottom: 33px;
+}
+.gender-banner__button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 300px;
+  padding: 10px 20px;
+  background-color: #E0E0E0;
+  opacity: 0.7;
+  color: #000;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 300;
+  font-size: 20px;
+  transition: background-color 0.3s ease;
+}
+}
+@media (max-width: 390px) {
+ .gender-banner {
+  display: flex;
+  justify-content: center; /* горизонтальное центрирование */
+  align-items: flex-end;   /* кнопка у нижнего края */
+  position: relative;
+  overflow: hidden;
+  width: 340px;
+  height: 588px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  padding-bottom: 33px;
+}
+
+.gender-banner__button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 180px;
+  padding: 10px 20px;
+  background-color: #E0E0E0;
+  opacity: 0.7;
+  color: #000;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 300;
+  font-size: 20px;
+  transition: background-color 0.3s ease;
+}
+}

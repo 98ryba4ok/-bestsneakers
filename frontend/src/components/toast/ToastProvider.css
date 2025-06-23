@@ -1,0 +1,31 @@
+/* src/components/toast/ToastProvider.css */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+  pointer-events: auto;
+  max-width: 300px;
+  word-wrap: break-word;
+}
+
+.toast-success {
+  background-color: #16a34a; /* зеленый */
+}
+
+.toast-error {
+  background-color: #dc2626; /* красный */
+}
+
+.toast-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+}
