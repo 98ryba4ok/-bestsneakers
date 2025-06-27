@@ -16,7 +16,7 @@ import './AppWithLoader.css';
 import UserOrders from './components/order_page/UserOrders';
 import CheckoutPage from './components/checkout_page/CheckoutPage';
 import RecentReviews from './components/reviews/RecentReviews';
-import TestButton from './components/testtoast';
+
 import AdminPanel from './components/AdminPanel/AdminPanel';
 export default function AppWithLoader() {
   const location = useLocation();
@@ -38,7 +38,7 @@ return (
           path="/"
           element={
             <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center' }}>
-              <TestButton/>
+           
               <MainBanner />
               <GenderGroup />
               <SneakerList />

@@ -12,6 +12,15 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 
+
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://83c3add888ba1d25a5acf0653f4230e1@o4509554311823360.ingest.de.sentry.io/4509554320605264",
+    # Add data like request headers and IP for users,
+    # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+    send_default_pii=True,
+)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -46,6 +55,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'users',
     'debug_toolbar',
+    'silk',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'silk.middleware.SilkyMiddleware',
 ]
 
 ROOT_URLCONF = 'bestsneakers.urls'

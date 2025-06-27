@@ -1,22 +1,38 @@
+# Django imports
 from django.contrib import admin
-from .models import *
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import CustomGroup
-from django.contrib.auth.admin import GroupAdmin
-from .forms import CustomUserCreationForm, CustomUserChangeForm
-from django.utils.safestring import mark_safe
+from django.conf import settings
 from django.http import HttpResponse
-from reportlab.pdfgen import canvas
-from io import BytesIO
+from django.utils.safestring import mark_safe
+from django.utils.timezone import localtime
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin, GroupAdmin
+from django.contrib.auth.models import Group
 
-# --- User ---
+# Project imports
+from .models import *
+from .forms import CustomUserCreationForm, CustomUserChangeForm
+
+# ReportLab imports
+from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+
+# Standard library
+from io import BytesIO
+from typing import Any
+import os
+
+# ---------------------- User ----------------------
 class UserAdmin(BaseUserAdmin):
     form = CustomUserChangeForm
     add_form = CustomUserCreationForm
 
     list_display = ('username', 'phone', 'address', 'date_joined', 'group_names')
-    search_fields = ('username', 'phone', 'address')
     list_filter = ('date_joined', 'groups')
+    search_fields = ('username', 'phone', 'address')
     list_display_links = ('username',)
     readonly_fields = ('date_joined',)
     filter_horizontal = ('groups', 'user_permissions')
@@ -37,49 +53,43 @@ class UserAdmin(BaseUserAdmin):
     )
 
     @admin.display(description='Groups')
-    def group_names(self, obj):
-        return ", ".join([g.name for g in obj.groups.all()])
-
-
+    def group_names(self, obj: Any) -> str:
+        return ", ".join(group.name for group in obj.groups.all())
 
 admin.site.register(User, UserAdmin)
 
-# --- Category ---
+# ---------------------- Category ----------------------
+@admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug', 'sneaker_count')
     search_fields = ('name', 'slug')
     list_filter = ('name',)
     list_display_links = ('name',)
     prepopulated_fields = {'slug': ('name',)}
-    date_hierarchy = None
 
     @admin.display(description='Sneaker Count')
-    def sneaker_count(self, obj):
+    def sneaker_count(self, obj: Any) -> int:
         return obj.sneakers.count()
 
-admin.site.register(Category, CategoryAdmin)
-
-# --- Brand ---
+# ---------------------- Brand ----------------------
+@admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
     list_display = ('name', 'country', 'sneaker_count')
     search_fields = ('name', 'country')
     list_filter = ('country',)
     list_display_links = ('name',)
-    date_hierarchy = None
 
     @admin.display(description='Sneaker Count')
-    def sneaker_count(self, obj):
-           return obj.sneakers.count()
+    def sneaker_count(self, obj: Any) -> int:
+        return obj.sneakers.count()
 
-admin.site.register(Brand, BrandAdmin)
-
-# --- Size ---
+# ---------------------- Size ----------------------
+@admin.register(Size)
 class SizeAdmin(admin.ModelAdmin):
     list_display = ['size']
 
-admin.site.register(Size, SizeAdmin)
-
-# --- Stock ---
+# ---------------------- Stock ----------------------
+@admin.register(Stock)
 class StockAdmin(admin.ModelAdmin):
     list_display = ('sneaker', 'size', 'quantity', 'date_added', 'is_low')
     list_filter = ('date_added', 'quantity')
@@ -90,12 +100,11 @@ class StockAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_added'
 
     @admin.display(boolean=True, description='Low Stock')
-    def is_low(self, obj):
+    def is_low(self, obj: Any) -> bool:
         return obj.quantity < 5
 
-admin.site.register(Stock, StockAdmin)
-
-# --- Cart ---
+# ---------------------- Cart ----------------------
+@admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
     list_display = ('user', 'sneaker', 'size', 'quantity', 'added_at', 'cart_total')
     list_filter = ('added_at',)
@@ -106,18 +115,16 @@ class CartAdmin(admin.ModelAdmin):
     date_hierarchy = 'added_at'
 
     @admin.display(description='Cart Total')
-    def cart_total(self, obj):
-        return obj.sneaker.price * obj.quantity if obj.sneaker else 0
+    def cart_total(self, obj: Any) -> float:
+        return obj.sneaker.price * obj.quantity if obj.sneaker else 0.0
 
-admin.site.register(Cart, CartAdmin)
-
-# --- OrderItem Inline ---
+# ---------------------- Order ----------------------
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 1
     raw_id_fields = ('sneaker', 'size')
 
-# --- Order ---
+@admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('user', 'total_price', 'created_at', 'status', 'item_count')
     list_filter = ('status', 'created_at')
@@ -127,41 +134,65 @@ class OrderAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at',)
     date_hierarchy = 'created_at'
     inlines = [OrderItemInline]
-    actions = ['download_orders_pdf']  # 👈 Добавили действие
+    actions = ['download_orders_pdf']
 
     @admin.display(description='Item Count')
-    def item_count(self, obj):
+    def item_count(self, obj: Any) -> int:
         return obj.items.count()
 
     def download_orders_pdf(self, request, queryset):
+        if not queryset:
+            self.message_user(request, "Нет выбранных заказов для скачивания.")
+            return HttpResponse(status=204)
+
+        font_path = os.path.join(settings.BASE_DIR, 'static', 'fonts', 'arabee.ttf')
+        font_name = 'Arabee'
+
+        if font_name not in pdfmetrics.getRegisteredFontNames():
+            pdfmetrics.registerFont(TTFont(font_name, font_path))
+
         buffer = BytesIO()
-        p = canvas.Canvas(buffer)
+        doc = SimpleDocTemplate(buffer, pagesize=A4)
+        styles = getSampleStyleSheet()
 
-        y = 800
+        styles.add(ParagraphStyle(name='CustomNormal', fontName=font_name, fontSize=10))
+        styles.add(ParagraphStyle(name='CustomHeading1', fontName=font_name, fontSize=14, leading=16, spaceAfter=10))
+
+        elements = []
+
         for order in queryset:
-            p.drawString(100, y, f"Order ID: {order.id}, User: {order.user.username}, Total: {order.total_price}₽")
-            y -= 20
+            elements += [
+                Paragraph(f"Заказ №{order.id}", styles['CustomHeading1']),
+                Paragraph(f"Пользователь: {order.user.username}", styles['CustomNormal']),
+                Spacer(1, 12)
+            ]
+
+            data = [["Товар", "Размер", "Кол-во", "Цена", "Сумма"]]
             for item in order.items.all():
-                p.drawString(120, y, f"- {item.sneaker.name}, Size: {item.size}, Qty: {item.quantity}")
-                y -= 15
-            y -= 10
-            if y < 100:
-                p.showPage()
-                y = 800
+                data.append([
+                    item.sneaker.name,
+                    str(item.size),
+                    str(item.quantity),
+                    f"{item.sneaker.price:.2f}₽",
+                    f"{item.sneaker.price * item.quantity:.2f}₽"
+                ])
 
-        p.showPage()
-        p.save()
+            table = Table(data)
+            table.setStyle(TableStyle([
+                ('FONTNAME', (0, 0), (-1, -1), font_name),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+            ]))
+            elements += [table, Spacer(1, 24)]
 
+        doc.build(elements)
         buffer.seek(0)
         return HttpResponse(buffer, content_type='application/pdf')
 
     download_orders_pdf.short_description = "Скачать выбранные заказы в PDF"
 
-admin.site.register(Order, OrderAdmin)
-
-
-
-# --- Review ---
+# ---------------------- Review ----------------------
+@admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ('user', 'sneaker', 'rating', 'created_at', 'short_comment')
     list_filter = ('created_at', 'rating')
@@ -172,14 +203,11 @@ class ReviewAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
 
     @admin.display(description='Comment')
-    def short_comment(self, obj):
-        return (obj.text[:30] + '...') if obj.text and len(obj.text) > 30 else obj.text
+    def short_comment(self, obj: Any) -> str:
+        return f"{obj.text[:30]}..." if obj.text and len(obj.text) > 30 else obj.text
 
-    
-
-admin.site.register(Review, ReviewAdmin)
-
-# --- Payment ---
+# ---------------------- Payment ----------------------
+@admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
     list_display = ('order', 'payment_method', 'status', 'created_at', 'order_user')
     list_filter = ('status', 'created_at', 'payment_method')
@@ -190,11 +218,10 @@ class PaymentAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
 
     @admin.display(description='Order User')
-    def order_user(self, obj):
+    def order_user(self, obj: Any) -> str:
         return obj.order.user.username if obj.order and obj.order.user else '-'
 
-admin.site.register(Payment, PaymentAdmin)
-
+# ---------------------- Sneaker ----------------------
 class StockInline(admin.TabularInline):
     model = Stock
     extra = 1
@@ -202,8 +229,9 @@ class StockInline(admin.TabularInline):
 
 class SneakerImageInline(admin.TabularInline):
     model = SneakerImage
-    extra = 3  # количество пустых форм по умолчанию
+    extra = 3
 
+@admin.register(Sneaker)
 class SneakerAdmin(admin.ModelAdmin):
     list_display = ('name', 'brand', 'category', 'price', 'created_at', 'updated_at', 'review_count')
     search_fields = ('name', 'brand__name', 'category__name')
@@ -212,15 +240,14 @@ class SneakerAdmin(admin.ModelAdmin):
     raw_id_fields = ('brand', 'category')
     readonly_fields = ('created_at', 'updated_at')
     date_hierarchy = 'created_at'
-    inlines = [StockInline,SneakerImageInline]
+    inlines = [StockInline, SneakerImageInline]
 
     @admin.display(description='Review Count')
-    def review_count(self, obj):
+    def review_count(self, obj: Any) -> int:
         return obj.reviews.count()
 
-admin.site.register(Sneaker, SneakerAdmin)
-
-# --- Main Banner ---
+# ---------------------- Main Banner ----------------------
+@admin.register(MainBanner)
 class MainBannerAdmin(admin.ModelAdmin):
     list_display = ('title', 'is_active', 'created_at', 'preview')
     list_filter = ('is_active', 'created_at')
@@ -229,19 +256,13 @@ class MainBannerAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
 
     @admin.display(description='Preview')
-    def preview(self, obj):
+    def preview(self, obj: Any) -> str:
         if obj.image:
             return mark_safe(f'<img src="{obj.image.url}" width="100" height="50" style="object-fit:cover;" />')
         return "No image"
 
-admin.site.register(MainBanner, MainBannerAdmin)
-
-
-@admin.register(CustomGroup)
-class CustomGroupAdmin(GroupAdmin):
-    pass
-
-# --- Privacy Policy ---
+# ---------------------- Privacy Policy ----------------------
+@admin.register(PrivacyPolicy)
 class PrivacyPolicyAdmin(admin.ModelAdmin):
     list_display = ('title', 'uploaded_at', 'is_active')
     search_fields = ('title',)
@@ -250,5 +271,7 @@ class PrivacyPolicyAdmin(admin.ModelAdmin):
     readonly_fields = ('uploaded_at',)
     date_hierarchy = 'uploaded_at'
 
-admin.site.register(PrivacyPolicy, PrivacyPolicyAdmin)
-
+# ---------------------- Custom Group ----------------------
+@admin.register(CustomGroup)
+class CustomGroupAdmin(GroupAdmin):
+    pass

@@ -10,6 +10,8 @@ from rest_framework_simplejwt.views import (
 )
 import debug_toolbar
 
+
+
 router = DefaultRouter()
 router.register(r'categories', CategoryViewSet)
 router.register(r'brands', BrandViewSet)
@@ -34,4 +36,5 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/filters/', FilterOptionsView.as_view(), name='filters'),
     path('__debug__/', include(debug_toolbar.urls)),
+     path('silk/', include('silk.urls', namespace='silk')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -3,59 +3,101 @@ from decimal import Decimal
 from django.db import transaction
 
 from .models import (
-     Category, Brand, Sneaker, Size, Stock, Cart, Order,
-    OrderItem, Review, Payment, MainBanner, PrivacyPolicy, SneakerImage, Stock
+    Category, Brand, Sneaker, Size, Stock, Cart, Order,
+    OrderItem, Review, Payment, MainBanner, PrivacyPolicy, SneakerImage
 )
-from users.serializers import UserSerializer 
+from users.serializers import UserSerializer
+
 
 class CategorySerializer(serializers.ModelSerializer):
+    """Сериализатор для категорий кроссовок."""
     class Meta:
         model = Category
         fields = '__all__'
 
+
 class SneakerImageSerializer(serializers.ModelSerializer):
+    """Сериализатор изображений кроссовок."""
     image = serializers.ImageField(use_url=True)
 
     class Meta:
         model = SneakerImage
         fields = ['id', 'image', 'is_main']
 
+
 class BrandSerializer(serializers.ModelSerializer):
+    """Сериализатор брендов."""
     class Meta:
         model = Brand
         fields = '__all__'
-        
+
+
 class SizeSerializer(serializers.ModelSerializer):
+    """Сериализатор размеров кроссовок."""
     class Meta:
         model = Size
         fields = '__all__'
 
+
 class SneakerSerializer(serializers.ModelSerializer):
+    """Сериализатор кроссовок с дополнительными полями и вложенными сериализаторами."""
     avg_rating = serializers.FloatField(read_only=True)
     images = SneakerImageSerializer(many=True, read_only=True)
     sizes = serializers.SerializerMethodField()
     sold_count = serializers.IntegerField(read_only=True)
 
+    brand = BrandSerializer(read_only=True)
+    brand_id = serializers.PrimaryKeyRelatedField(
+        queryset=Brand.objects.all(), source='brand', write_only=True
+    )
+
+    category = CategorySerializer(read_only=True)
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(), source='category', write_only=True
+    )
+
     class Meta:
         model = Sneaker
-        fields = '__all__'
-    def get_sizes(self, obj):
+        fields = [
+            'id', 'name', 'price', 'description', 'avg_rating', 'images', 'sizes',
+            'sold_count', 'brand', 'brand_id', 'category', 'category_id'
+        ]
+
+    def get_sizes(self, obj: Sneaker) -> list:
+        """
+        Получение размеров с положительным количеством на складе.
+
+        Args:
+            obj (Sneaker): Объект кроссовка.
+
+        Returns:
+            list: Список сериализованных размеров.
+        """
         stocks = obj.stock.filter(quantity__gt=0).select_related('size')
         sizes = [stock.size for stock in stocks]
         return SizeSerializer(sorted(sizes, key=lambda s: s.size), many=True).data
 
 
 class CheckoutSerializer(serializers.Serializer):
+    """Сериализатор оформления заказа."""
     full_name = serializers.CharField(max_length=255)
     phone = serializers.CharField(max_length=20)
     address = serializers.CharField(max_length=500)
-    
     payment_method = serializers.ChoiceField(
         choices=[('card', 'Карта'), ('paypal', 'PayPal'), ('crypto', 'Криптовалюта')],
         required=True
     )
 
-    def validate(self, data):
+    def validate(self, data: dict) -> dict:
+        """
+        Валидация корзины пользователя.
+
+        Args:
+            data (dict): Входные данные.
+
+        Returns:
+            dict: Валидированные данные.
+        """
         user = self.context['request'].user
         cart_items = Cart.objects.filter(user=user).select_related('sneaker', 'size')
 
@@ -68,7 +110,16 @@ class CheckoutSerializer(serializers.Serializer):
         )
         return data
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict) -> Order:
+        """
+        Создание заказа и проведение транзакции.
+
+        Args:
+            validated_data (dict): Валидированные данные заказа.
+
+        Returns:
+            Order: Созданный заказ.
+        """
         user = self.context['request'].user
         payment_method = validated_data['payment_method']
         full_name = validated_data['full_name']
@@ -122,15 +173,15 @@ class CheckoutSerializer(serializers.Serializer):
             return order
 
 
-
-
 class StockSerializer(serializers.ModelSerializer):
+    """Сериализатор складских остатков."""
     class Meta:
         model = Stock
         fields = '__all__'
 
 
 class CartSerializer(serializers.ModelSerializer):
+    """Сериализатор корзины пользователя."""
     size = SizeSerializer(read_only=True)
     size_id = serializers.PrimaryKeyRelatedField(source='size', queryset=Size.objects.all(), write_only=True)
     id = serializers.ReadOnlyField()
@@ -139,23 +190,29 @@ class CartSerializer(serializers.ModelSerializer):
         model = Cart
         fields = ['id', 'sneaker', 'size', 'size_id', 'quantity', 'user']
         read_only_fields = ('user',)
+    
+    def validate(self, data: dict) -> dict:
+        sneaker = data.get('sneaker') or getattr(self.instance, 'sneaker', None)
+        size = data.get('size') or getattr(self.instance, 'size', None)
+        quantity = data.get('quantity') or getattr(self.instance, 'quantity', None)
 
-    def validate(self, data):
-        sneaker = data['sneaker']
-        size = data['size']
-        quantity = data['quantity']
+        # Если PATCH и обновляется только quantity — sneaker и size не передаются, но должны быть в instance
+        if not sneaker or not size:
+            raise serializers.ValidationError("Невозможно определить товар или размер.")
 
         try:
             stock = Stock.objects.get(sneaker=sneaker, size=size)
         except Stock.DoesNotExist:
             raise serializers.ValidationError(f"Кроссовки {sneaker.name} размер {size.size} отсутствуют на складе.")
 
-        # проверяем общее количество с учётом уже имеющегося в корзине
         user = self.context['request'].user
         existing = Cart.objects.filter(user=user, sneaker=sneaker, size=size).first()
-        total_quantity = quantity
-        if existing:
-            total_quantity += existing.quantity
+        
+        # В случае PATCH — избежать удвоения количества
+        if self.instance:
+            total_quantity = quantity
+        else:
+            total_quantity = quantity + (existing.quantity if existing else 0)
 
         if total_quantity > stock.quantity:
             raise serializers.ValidationError(
@@ -164,7 +221,17 @@ class CartSerializer(serializers.ModelSerializer):
 
         return data
 
-    def create(self, validated_data):
+
+    def create(self, validated_data: dict) -> Cart:
+        """
+        Создание или обновление записи в корзине.
+
+        Args:
+            validated_data (dict): Валидированные данные.
+
+        Returns:
+            Cart: Объект корзины.
+        """
         validated_data['user'] = self.context['request'].user
         user = validated_data['user']
         sneaker = validated_data['sneaker']
@@ -180,41 +247,59 @@ class CartSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-
-
 class OrderItemSerializer(serializers.ModelSerializer):
+    """Сериализатор элемента заказа."""
     size = serializers.SerializerMethodField()
-    sneaker = SneakerSerializer(read_only=True)  # если ты выводишь имя и картинку
-    
+    sneaker = SneakerSerializer(read_only=True)
+
     class Meta:
         model = OrderItem
         fields = ['id', 'sneaker', 'size', 'quantity', 'price']
 
-    def get_size(self, obj):
-        return str(obj.size)  # или obj.size.size, если поле называется так
+    def get_size(self, obj: OrderItem) -> str:
+        """
+        Получение текстового представления размера.
 
+        Args:
+            obj (OrderItem): Элемент заказа.
+
+        Returns:
+            str: Размер обуви.
+        """
+        return str(obj.size)
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    """Сериализатор заказа."""
     items = OrderItemSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order
         fields = '__all__'
+        read_only_fields = ['id', 'user', 'items', 'total_price', 'created_at']
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    """Сериализатор отзывов кроссовок."""
     user = UserSerializer(read_only=True)
 
     class Meta:
         model = Review
         fields = ['id', 'rating', 'text', 'created_at', 'user', 'sneaker']
 
-    def validate(self, data):
+    def validate(self, data: dict) -> dict:
+        """
+        Проверка наличия заказа и уникальности отзыва.
+
+        Args:
+            data (dict): Данные отзыва.
+
+        Returns:
+            dict: Валидированные данные.
+        """
         user = self.context['request'].user
         sneaker = data.get('sneaker')
 
-        # Проверяем, есть ли у пользователя заказ, содержащий этот кроссовок
         has_ordered = OrderItem.objects.filter(
             order__user=user,
             sneaker=sneaker
@@ -222,34 +307,36 @@ class ReviewSerializer(serializers.ModelSerializer):
 
         if not has_ordered:
             raise serializers.ValidationError("Вы можете оставить отзыв только на кроссовки, которые покупали.")
-        
+
         if Review.objects.filter(user=user, sneaker=sneaker).exists():
             raise serializers.ValidationError("Вы уже оставляли отзыв на эти кроссовки.")
-
 
         return data
 
 
-
 class PaymentSerializer(serializers.ModelSerializer):
+    """Сериализатор платежей."""
     class Meta:
         model = Payment
         fields = '__all__'
 
 
 class MainBannerSerializer(serializers.ModelSerializer):
+    """Сериализатор главного баннера."""
     class Meta:
         model = MainBanner
         fields = '__all__'
 
 
 class PrivacyPolicySerializer(serializers.ModelSerializer):
+    """Сериализатор политики конфиденциальности."""
     class Meta:
         model = PrivacyPolicy
         fields = '__all__'
 
-        
+
 class FilterOptionsSerializer(serializers.Serializer):
+    """Сериализатор фильтров для поиска кроссовок."""
     brands = serializers.ListField(child=serializers.CharField())
     categories = serializers.ListField(child=serializers.CharField())
     colors = serializers.ListField(child=serializers.CharField())

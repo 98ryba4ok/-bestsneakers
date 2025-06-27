@@ -53,33 +53,40 @@ export default function SneakerEditModal({
   }, []);
 
   const handleSave = async () => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    console.error("Токен не найден, нужно авторизоваться.");
-    return;
-  }
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("Токен не найден, нужно авторизоваться.");
+      return;
+    }
 
-  try {
-    await axios.put(
-      `http://localhost:8000/api/sneakers/${sneakerId}/`,
-      {
-        name,
-        price,
-        description,
-        brand: brandId,
-        category: categoryId,
-      },
-      {
-        headers: { Authorization: `Token ${token}` },
-      }
-    );
-    onUpdate();
-    onClose();
-  } catch (error: any) {
-    console.error('Ошибка при обновлении товара:', error.response?.data || error);
-  }
-};
+    // Проверка обязательных полей
+    if (!name || !price || !brandId || !categoryId) {
+      console.error("Пожалуйста, заполните все поля.");
+      return;
+    }
 
+    try {
+      
+      await axios.put(
+        `http://localhost:8000/api/sneakers/${sneakerId}/`,
+        {
+          name,
+          price,
+          description,
+          brand_id: brandId.id,
+          category_id: categoryId.id 
+       
+        },
+        {
+          headers: { Authorization: `Token ${token}` },
+        }
+      );
+      onUpdate();
+      onClose();
+    } catch (error: any) {
+      console.error('Ошибка при обновлении товара:', error.response?.data || error);
+    }
+  };
 
   const handleDelete = () => {
     const token = localStorage.getItem("token");
@@ -115,14 +122,20 @@ export default function SneakerEditModal({
           onChange={e => setDescription(e.target.value)}
           placeholder="Описание"
         />
-        <select value={brandId} onChange={e => setBrandId(parseInt(e.target.value))}>
-          <option value="">Выберите бренд</option>
+        <select
+          value={brandId}
+          onChange={e => setBrandId(parseInt(e.target.value))}
+        >
+          <option disabled value="">Выберите бренд</option>
           {brands.map(brand => (
             <option key={brand.id} value={brand.id}>{brand.name}</option>
           ))}
         </select>
-        <select value={categoryId} onChange={e => setCategoryId(parseInt(e.target.value))}>
-          <option value="">Выберите категорию</option>
+        <select
+          value={categoryId}
+          onChange={e => setCategoryId(parseInt(e.target.value))}
+        >
+          <option disabled value="">Выберите категорию</option>
           {categories.map(cat => (
             <option key={cat.id} value={cat.id}>{cat.name}</option>
           ))}

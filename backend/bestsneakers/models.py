@@ -1,20 +1,28 @@
+from __future__ import annotations
+
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.models import Group as AuthGroup
 from django.core.validators import MinValueValidator, MaxValueValidator
+from typing import Optional
+from django.core.exceptions import ValidationError
 
 class SneakerQuerySet(models.QuerySet):
-    def available(self):
+    def available(self) -> SneakerQuerySet:
+        """Возвращает только кроссовки, доступные на складе."""
         return self.filter(stock__quantity__gt=0)
 
+
 class SneakerManager(models.Manager):
-    def get_queryset(self):
+    def get_queryset(self) -> SneakerQuerySet:
         return SneakerQuerySet(self.model, using=self._db)
 
-    def available(self):
+    def available(self) -> SneakerQuerySet:
         return self.get_queryset().available()
+
+
 class CustomGroup(AuthGroup):
     class Meta:
         proxy = True
@@ -35,7 +43,7 @@ class User(AbstractUser):
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.username
 
 
@@ -48,7 +56,7 @@ class Category(models.Model):
         verbose_name = "Категория"
         verbose_name_plural = "Категории"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -61,7 +69,7 @@ class Brand(models.Model):
         verbose_name = "Бренд"
         verbose_name_plural = "Бренды"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -90,11 +98,12 @@ class Sneaker(models.Model):
         verbose_name = "Кроссовок"
         verbose_name_plural = "Кроссовки"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def get_absolute_url(self):
-        return reverse('sneaker_detail', args=[str(self.id)])
+    def get_absolute_url(self) -> str:
+        return reverse('sneaker-detail', args=[str(self.id)])
+
 
 class SneakerImage(models.Model):
     sneaker = models.ForeignKey(Sneaker, on_delete=models.CASCADE, related_name='images', verbose_name="Кроссовок")
@@ -105,7 +114,7 @@ class SneakerImage(models.Model):
         verbose_name = "Изображение кроссовка"
         verbose_name_plural = "Изображения кроссовок"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Изображение для {self.sneaker.name}"
 
 
@@ -116,7 +125,7 @@ class Size(models.Model):
         verbose_name = "Размер"
         verbose_name_plural = "Размеры"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.size)
 
 
@@ -131,7 +140,7 @@ class Stock(models.Model):
         verbose_name = "Склад"
         verbose_name_plural = "Склад"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.sneaker.name} - {self.size.size} : {self.quantity} шт."
 
 
@@ -146,7 +155,7 @@ class Cart(models.Model):
         verbose_name = "Корзина"
         verbose_name_plural = "Корзины"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Корзина пользователя {self.user.username}: {self.sneaker.name} ({self.size.size}) x {self.quantity}"
 
 
@@ -159,11 +168,16 @@ class Order(models.Model):
     address = models.TextField()
     status = models.CharField(
         max_length=50,
-        choices=[('pending', 'Ожидание'), ('shipped', 'Отправлен'), ('delivered', 'Доставлен')],
+        choices=[
+            ('pending', 'Ожидание'),
+            ('processing', 'В обработке'),
+            ('shipped', 'Отправлен'),
+            ('delivered', 'Доставлен'),
+            ('cancelled', 'Отменён'),
+        ],
         verbose_name="Статус"
     )
-    
-    # ⬇️ Это ключевое добавление
+
     sneakers = models.ManyToManyField(
         'Sneaker',
         through='OrderItem',
@@ -176,10 +190,13 @@ class Order(models.Model):
         verbose_name = "Заказ"
         verbose_name_plural = "Заказы"
 
-    def __str__(self):
+    def clean(self):
+        if self.total_price <= 0:
+            raise ValidationError({'total_price': 'Общая сумма заказа должна быть больше нуля.'})
+
+    def __str__(self) -> str:
         return f"Заказ #{self.id} от {self.created_at.date()} (Пользователь: {self.user.username})"
 
-    
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items', verbose_name="Заказ")
@@ -192,18 +209,21 @@ class OrderItem(models.Model):
         verbose_name = "Элемент заказа"
         verbose_name_plural = "Элементы заказа"
 
-    def __str__(self):
+    
+    def __str__(self) -> str:
         return f"{self.sneaker.name} ({self.size.size}) x {self.quantity}"
 
 
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews', verbose_name="Пользователь")
     sneaker = models.ForeignKey(Sneaker, on_delete=models.CASCADE, related_name='reviews', verbose_name="Кроссовок")
-    rating = models.PositiveIntegerField( 
+    rating = models.PositiveIntegerField(
         validators=[
             MinValueValidator(1, message="Рейтинг не может быть меньше 1."),
             MaxValueValidator(5, message="Рейтинг не может быть больше 5.")
-        ],verbose_name="Рейтинг")
+        ],
+        verbose_name="Рейтинг"
+    )
     text = models.TextField(verbose_name="Текст отзыва")
     created_at = models.DateTimeField(default=timezone.now, verbose_name="Дата создания")
 
@@ -212,7 +232,7 @@ class Review(models.Model):
         verbose_name = "Отзыв"
         verbose_name_plural = "Отзывы"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Отзыв от {self.user.username} на {self.sneaker.name} — {self.rating}★"
 
 
@@ -235,8 +255,9 @@ class Payment(models.Model):
         verbose_name = "Платеж"
         verbose_name_plural = "Платежи"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Платеж #{self.id} для заказа #{self.order.id} — {self.get_payment_method_display()} ({self.get_status_display()})"
+
 
 class MainBanner(models.Model):
     title = models.CharField(max_length=100, verbose_name="Заголовок")
@@ -249,7 +270,7 @@ class MainBanner(models.Model):
         verbose_name = "Главный баннер"
         verbose_name_plural = "Главные баннеры"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.title
 
 
@@ -263,5 +284,5 @@ class PrivacyPolicy(models.Model):
         verbose_name = "Политика конфиденциальности"
         verbose_name_plural = "Политики конфиденциальности"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.title} ({self.uploaded_at.date()})"
