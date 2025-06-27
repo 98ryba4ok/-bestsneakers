@@ -162,7 +162,7 @@ class CategoryModelTest(TestCase):
         c2 = Category.objects.create(name="Beta", slug="beta")
         self.assertEqual(str(c1), "Alpha")
         qs = Category.objects.all()
-        self.assertEqual(list(qs), [c1, c2])  # ordered by name ascending
+        self.assertEqual(list(qs), [c1, c2]) 
 
 
 class BrandModelTest(TestCase):

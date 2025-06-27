@@ -3,7 +3,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser, B
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from django.db.models import Avg, Count, Max, Sum, F, QuerySet
+from django.db.models import Avg, Count, Max, Sum, F, QuerySet, Prefetch
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import *
 from .serializers import *
@@ -156,7 +156,9 @@ class OrderViewSet(viewsets.ModelViewSet):
             QuerySet: Список заказов.
         """
         user = self.request.user
-        qs = Order.objects.select_related('user').prefetch_related('items').annotate(
+        qs = Order.objects.select_related('user').prefetch_related(
+            Prefetch('items', queryset=OrderItem.objects.select_related('sneaker', 'size'))
+        ).annotate(
             total_items=Sum('items__quantity')
         )
         if user.is_staff:
@@ -175,18 +177,13 @@ class OrderViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args: Any, **kwargs: Any) -> Response:
         """
         Частичное обновление заказа (например, изменение статуса).
-
-        Returns:
-            Response: Ответ с ошибкой или результатом обновления.
+        Только администратор может менять статус заказа.
         """
-        order = self.get_object()
-        new_status = request.data.get('status')
-
-        if new_status == 'cancelled' and order.status in ['shipped', 'delivered']:
+        if 'status' in request.data and not request.user.is_staff:
             return Response(
-                {'error': 'Нельзя отменить заказ, который уже отправлен или доставлен.'},
-                status=status.HTTP_400_BAD_REQUEST)
-
+                {'error': 'Только администратор может менять статус заказа.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
         return super().partial_update(request, *args, **kwargs)
 
     def list(self, request, *args: Any, **kwargs: Any) -> Response:
