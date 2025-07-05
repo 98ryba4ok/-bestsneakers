@@ -1,130 +1,95 @@
 import { useEffect, useState } from "react";
-import { getCart, saveCart } from "../../utils/cart";
-import axios from "axios";
-import type { Sneaker } from "../../types/Sneaker.ts";
-import './CartPage.css';
-import trashIcon from '../../assets/trash-bin.png';
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
-type CartItem = {
-  id: number;
-  sneaker: number;
-  size: {
-    id: number;
-    size: number;
-  };
-  quantity: number;
-};
-
+import type { AppDispatch } from "../../store";
+import {
+  fetchCart,
+  updateCartItem,
+  removeCartItem,
+  selectCartItems,
+} from "../../store/cartSlice";
+import { fetchUserProfile } from "../../store/userSlice";
+import type { Sneaker } from "../../types/Sneaker";
+import './CartPage.css';
+import trashIcon from "../../assets/trash-bin.png";
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [sneakersData, setSneakersData] = useState<Record<number, Sneaker>>({});
-
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
+
+  const cartItems = useSelector(selectCartItems);
+  const [sneakersData, setSneakersData] = useState<Record<number, Sneaker>>({});
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (token) {
-      // Загрузить профиль и корзину с сервера
-      axios.get("http://localhost:8000/api/profile/", {
-        headers: { Authorization: `Token ${token}` }
-      }).then(() => {
-
-        // Теперь загрузить корзину
-        return axios.get("http://localhost:8000/api/cart/", {
-          headers: { Authorization: `Token ${token}` }
-        });
-      })
-      .then(res => {
-        setCartItems(res.data); // Предполагаем, что сервер отдаёт массив CartItem
-      })
-      .catch(() => {
-       
-        // fallback — локалка
-        const cart = getCart();
-        setCartItems(cart);
-      });
-    } else {
-      // Гость — локалка
-      const cart = getCart();
-      setCartItems(cart);
+      dispatch(fetchUserProfile(token));
     }
-  }, []);
+    dispatch(fetchCart());
+  }, [dispatch]);
 
+  // Логируем cartItems только при их изменении
   useEffect(() => {
-    // Подгрузить данные кроссовок
-    const uniqueIds = [...new Set(cartItems.map(item => item.sneaker))];
+
+  }, [cartItems]);
+
+  // Отдельный useEffect для уникальных sneakerIds с логом
+  useEffect(() => {
+    const uniqueIds = [...new Set(
+  cartItems
+    .map(item => item.sneakerId)
+    .filter((id): id is number => id !== undefined)
+)];
+
+
+
+    if (uniqueIds.length === 0) {
+      setSneakersData({});
+      return;
+    }
 
     Promise.all(
       uniqueIds.map(id =>
-        fetch(`http://localhost:8000/api/sneakers/${id}/`).then(res => res.json())
+        fetch(`http://localhost:8000/api/sneakers/${id}/`)
+          .then(res => {
+            if (!res.ok) throw new Error(`Sneaker ${id} not found`);
+            return res.json();
+          })
       )
-    ).then(sneakers => {
-      const data: Record<number, Sneaker> = {};
-      sneakers.forEach(sneaker => {
-        data[sneaker.id] = sneaker;
+    )
+      .then(sneakers => {
+        console.log("sneakers fetched:", sneakers);
+        const data: Record<number, Sneaker> = {};
+        sneakers.forEach(sneaker => {
+          console.log(`Sneaker ${sneaker.id} images:`, sneaker.images);
+          data[sneaker.id] = sneaker;
+        });
+        setSneakersData(data);
+      })
+      .catch(err => {
+        console.error("Ошибка при загрузке кроссовок:", err);
       });
-      setSneakersData(data);
-    });
   }, [cartItems]);
+
+  const updateQuantity = (index: number, delta: number) => {
+    const item = cartItems[index];
+    const newQty = item.quantity + delta;
+    if (newQty < 1) return;
+    dispatch(updateCartItem({ ...item, quantity: newQty }));
+  };
+
+  const removeItem = (index: number) => {
+    const item = cartItems[index];
+    dispatch(removeCartItem(item));
+  };
 
   const handleClick = (id: number) => {
     navigate(`/sneakers/${id}`);
   };
 
-  const updateQuantity = (index: number, delta: number) => {
-    const updated = [...cartItems];
-    const newQty = updated[index].quantity + delta;
-    if (newQty < 1) return;
-
-    updated[index].quantity = newQty;
-
-    const token = localStorage.getItem("token");
-    if (token) {
-      // Обновляем на сервере
-      const item = updated[index];
-axios.patch(`http://localhost:8000/api/cart/${item.id}/`, { quantity: item.quantity }, {
-  headers: { Authorization: `Token ${token}` }
-})
-
-      .then(() => {
-        setCartItems(updated);
-        window.dispatchEvent(new Event("cartUpdated"));
-      })
-      .catch(err => console.error("Ошибка обновления количества:", err));
-    } else {
-      // Локалка
-      setCartItems(updated);
-      saveCart(updated);
-    }
-  };
-
-  const removeItem = (index: number) => {
-    const updated = [...cartItems];
-    const removedItem = updated.splice(index, 1)[0];
-
-    const token = localStorage.getItem("token");
-    if (token) {
-      axios.delete(`http://localhost:8000/api/cart/${removedItem.id}/`, {
-  headers: { Authorization: `Token ${token}` }
-})
-
-      .then(() => {
-        setCartItems(updated);
-        window.dispatchEvent(new Event("cartUpdated"));
-      })
-      .catch(err => console.error("Ошибка удаления товара из корзины:", err));
-    } else {
-      setCartItems(updated);
-      saveCart(updated);
-    }
-  };
-
   const totalPrice = cartItems.reduce((sum, item) => {
-    const sneaker = sneakersData[item.sneaker];
-    return sneaker ? sum + sneaker.price * item.quantity : sum;
+    const sneaker = sneakersData[item.sneakerId];
+    return sneaker ? sum + parseFloat(sneaker.price) * item.quantity : sum;
   }, 0);
 
   return (
@@ -135,24 +100,28 @@ axios.patch(`http://localhost:8000/api/cart/${item.id}/`, { quantity: item.quant
       ) : (
         <>
           {cartItems.map((item, index) => {
-            console.log("item.size:", item.size);
-
-            const sneaker = sneakersData[item.sneaker];
-            if (!sneaker) return null;
+            const sneaker = sneakersData[item.sneakerId];
+            if (!sneaker || !Array.isArray(sneaker.images) || sneaker.images.length === 0) {
+              return <div key={`${item.sneakerId}-${item.sizeId}`}>Данные о кроссовке загружаются...</div>;
+            }
 
             const mainImage = sneaker.images.find(img => img.is_main)?.image || "";
 
             return (
-              <div key={index} className="cart-item" onClick={() => handleClick(sneaker.id)}>
+              <div
+                key={`${item.sneakerId}-${item.sizeId}`}
+                className="cart-item"
+                onClick={() => handleClick(sneaker.id)}
+              >
                 <img src={mainImage} alt={sneaker.name} className="cart-image" />
                 <div className="cart-info name">{sneaker.name}</div>
-                <div className="cart-info size">{item.size.size} EU</div>
+                <div className="cart-info size">{item.sizeId} EU</div>
                 <div className="cart-info quantity">
                   <button onClick={(e) => { e.stopPropagation(); updateQuantity(index, -1); }}>-</button>
                   <span>{item.quantity}</span>
                   <button onClick={(e) => { e.stopPropagation(); updateQuantity(index, 1); }}>+</button>
                 </div>
-                <div className="cart-info price">{sneaker.price * item.quantity} ₽</div>
+                <div className="cart-info price">{(parseFloat(sneaker.price) * item.quantity).toFixed(2)} ₽</div>
                 <div className="cart-info remove">
                   <button onClick={(e) => { e.stopPropagation(); removeItem(index); }}>
                     <img src={trashIcon} alt="Удалить" />
@@ -162,10 +131,10 @@ axios.patch(`http://localhost:8000/api/cart/${item.id}/`, { quantity: item.quant
             );
           })}
           <div className="cart-footer">
-            <div className="cart-total">Итого: {totalPrice} ₽</div>
+            <div className="cart-total">Итого: {totalPrice.toFixed(2)} ₽</div>
             <button className="checkout-button" onClick={() => navigate('/checkout')}>
-  Оформить заказ
-</button>
+              Оформить заказ
+            </button>
           </div>
         </>
       )}

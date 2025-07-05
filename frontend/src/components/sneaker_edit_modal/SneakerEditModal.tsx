@@ -15,7 +15,7 @@ interface Category {
 interface Props {
   sneakerId: number;
   initialName: string;
-  initialPrice: number;
+  initialPrice: string;
   initialDescription: string;
   initialBrandId: number;
   initialCategoryId: number;

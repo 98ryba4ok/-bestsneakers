@@ -1,25 +1,24 @@
+import  type { Brand } from './Brand';
+import type { Category } from './Category';
+import type { Size } from './Size';
 export interface SneakerImage {
   id: number;
   image: string;
   is_main: boolean;
 }
-export interface SneakerSize {
-  id: number;
-  size: number;
-}
+
 
 export interface Sneaker {
   id: number;
   avg_rating: number | null;
   name: string;
-  price:  number;
+  price:  string;
   description: string;
-  gender: string;
+  gender: 'F' | 'M' | 'U';
   color: string;
-  created_at: string;
-  updated_at: string;
-  brand: number;
-  category: number;
-  sizes: SneakerSize[];
-  images: SneakerImage[]; // 👈 новое поле вместо image
+  brand: Brand;
+  sold_count: number | null;
+  category: Category;
+  sizes: Size[];
+  images: SneakerImage[]; 
 }

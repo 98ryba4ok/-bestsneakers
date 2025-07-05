@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import './SneakerPage.css';
 import type { Sneaker, SneakerImage } from '../../types/Sneaker';
-import { addToCart } from '../../utils/cart';
+import { useAppDispatch } from '../../store/hooks';
+import { addToCart } from '../../store/cartSlice';
 import arrow_left from '../../assets/arrow_left.svg';
 import arrow_right from '../../assets/arrow_right.svg';
 import ReviewForm from '../../components/reviews/ReviewForm';
@@ -11,11 +12,16 @@ import ReviewList from '../../components/reviews/ReviewList';
 import SneakerEditModal from '../../components/sneaker_edit_modal/SneakerEditModal';
 import { useToast } from '../../components/toast/ToastProvider';
 
-function formatSize(size: number): string {
-  return Number.isInteger(size) ? String(size) : size.toFixed(1);
+function formatSize(size: string): string {
+  const parsed = parseFloat(size);
+  if (isNaN(parsed)) return size; // если парсинг не удался, вернём как есть
+
+  return Number.isInteger(parsed) ? String(parsed) : parsed.toFixed(1);
 }
 
+
 export default function SneakerPage() {
+  const dispatch = useAppDispatch();
   const { id } = useParams<{ id: string }>();
   const sneakerId = Number(id);
   const { showToast } = useToast();
@@ -76,46 +82,31 @@ useEffect(() => {
   }, [sneakerId]);
 
   // Добавление в корзину
-  const handleAddToCart = () => {
-    if (!selectedSizeId || !sneaker) return;
+const handleAddToCart = () => {
+  if (!selectedSizeId || !sneaker) return;
 
-    const item = {
-      sneaker: sneaker.id,
-      size_id: selectedSizeId,
-      quantity: 1,
-    };
-
-    const token = localStorage.getItem('token');
-
-    if (token) {
-      axios.post('http://localhost:8000/api/cart/', item, {
-        headers: { Authorization: `Token ${token}` }
-      })
-        .then(() => {
-          window.dispatchEvent(new Event('cartUpdated'));
-        })
-        .catch(err => {
+  const selectedSizeObj = sneaker.sizes.find(sizeObj => sizeObj.id === selectedSizeId);
+  if (!selectedSizeObj) return;
+  
   
 
-  const data = err.response?.data;
-
-  const message =
-    Array.isArray(data) ? data[0] :
-    data?.detail ||
-    (Array.isArray(data?.non_field_errors) ? data.non_field_errors[0] : null) ||
-    (typeof data === 'string' ? data : null) ||
-    "Ошибка при добавлении в корзину";
-
-  showToast(message, "error");
-});
-
-
-
-
-    } else {
-      addToCart(item);
-    }
+  const itemForStore = {
+    sneakerId: sneaker.id,
+    sizeId: selectedSizeId,
+    quantity: 1,
   };
+
+  // Просто диспатчим thunk, он уже сделает запрос и обновит стор
+  dispatch(addToCart(itemForStore))
+    .unwrap()
+    .then(() => showToast('Товар добавлен в корзину', 'success'))
+    .catch(err => {
+      const message = err?.response?.data?.detail || "Ошибка при добавлении в корзину";
+      showToast(message, "error");
+    console.error('Ошибка при добавлении в корзину:', err);
+    });
+};
+
 
   // Переключение изображений
   const handleNextImage = () => {
@@ -173,7 +164,7 @@ useEffect(() => {
 
         <div className="SneakerPage_info">
           <h2>{sneaker.name}</h2>
-          <p className="SneakerPage_price">{sneaker.price.toLocaleString('ru-RU')} ₽</p>
+          <p className="SneakerPage_price">{sneaker.price} ₽</p>
 
           <div className="SneakerPage_sizes">
             <p>Размеры</p>
@@ -225,8 +216,8 @@ useEffect(() => {
           initialName={sneaker.name}
           initialPrice={sneaker.price}
           initialDescription={sneaker.description}
-          initialBrandId={sneaker.brand}    
-          initialCategoryId={sneaker.category} 
+          initialBrandId={sneaker.brand.id}    
+          initialCategoryId={sneaker.category.id} 
           onClose={() => setIsEditModalOpen(false)}
           onUpdate={() => {
             // Перезагрузка данных после редактирования

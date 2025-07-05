@@ -50,7 +50,7 @@ class SneakerSerializer(serializers.ModelSerializer):
     brand_id = serializers.PrimaryKeyRelatedField(
         queryset=Brand.objects.all(), source='brand', write_only=True
     )
-
+    gender = serializers.ChoiceField(choices=Sneaker.GENDER_CHOICES)
     category = CategorySerializer(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(), source='category', write_only=True
@@ -60,7 +60,7 @@ class SneakerSerializer(serializers.ModelSerializer):
         model = Sneaker
         fields = [
             'id', 'name', 'price', 'description', 'avg_rating', 'images', 'sizes',
-            'sold_count', 'brand', 'brand_id', 'category', 'category_id'
+            'sold_count', 'brand', 'brand_id', 'category', 'category_id', 'gender'
         ]
 
     def get_sizes(self, obj: Sneaker) -> list:
@@ -177,7 +177,7 @@ class StockSerializer(serializers.ModelSerializer):
     """Сериализатор складских остатков."""
     class Meta:
         model = Stock
-        fields = '__all__'
+        fields = 'id', 'quantity', 'sneaker', 'size'
 
 
 class CartSerializer(serializers.ModelSerializer):
@@ -223,6 +223,7 @@ class CartSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data: dict) -> Cart:
+        print("CREATE DATA:", validated_data)
         """
         Создание или обновление записи в корзине.
 
@@ -236,6 +237,7 @@ class CartSerializer(serializers.ModelSerializer):
         user = validated_data['user']
         sneaker = validated_data['sneaker']
         size = validated_data['size']
+        
 
         existing = Cart.objects.filter(user=user, sneaker=sneaker, size=size).first()
 
